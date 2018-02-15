@@ -19,12 +19,19 @@
 # THE SOFTWARE.
 
 require_relative 'lib/connection'
+require_relative 'lib/query'
 
 require 'io/wait'
 
 module FFI
 	module Postgres
 		class Connection < Pointer
+			def initialize(address, io)
+				super(address)
+				
+				@io = io
+			end
+			
 			def self.connect(connection_string = "", io: ::IO)
 				pointer = Lib.connect_start(connection_string)
 				
@@ -37,7 +44,7 @@ module FFI
 					io.send(status)
 				end
 				
-				return self.new(pointer)
+				return self.new(pointer, io)
 			end
 			
 			# Return the status of the connection.
@@ -58,6 +65,30 @@ module FFI
 			# Close the connection.
 			def close
 				Lib.finish(self)
+			end
+			
+			def query(string)
+				check! Lib.send_query(self, string)
+				
+				while true
+					@io.wait_readable
+					
+					check! Lib.consume_input(self)
+					
+					while Lib.is_busy(self) == 0
+						result = Lib.get_result(self)
+						yield result
+					end
+				end
+			end
+				
+			private
+			
+			def check! result
+				if result == 0
+					message = Lib.error_message(self)
+					raise Error.new(message)
+				end
 			end
 		end
 	end
