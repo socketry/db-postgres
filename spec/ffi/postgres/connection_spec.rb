@@ -13,7 +13,7 @@ RSpec.describe FFI::Postgres::Lib do
 	
 	it "should execute query" do
 		connection.query("SELECT 42 AS LIFE") do |results|
-			puts results.each.to_a
+			expect(results.each.to_a).to be == [["42"]]
 		end
 	end
 end
