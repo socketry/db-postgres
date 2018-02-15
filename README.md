@@ -2,8 +2,7 @@
 
 A light-weight wrapper for Ruby exposing [libpq][1].
 
-[![Build Status](https://secure.travis-ci.org/ioquatix/ffi-postgres.svg)](http://travis-ci.org/ioquatix/ffi-postgres)
-[![Code Climate](https://codeclimate.com/github/ioquatix/ffi-postgres.svg)](https://codeclimate.com/github/ioquatix/ffi-postgres)
+[![Build Status](https://secure.travis-ci.org/socketry/ffi-postgres.svg)](http://travis-ci.org/socketry/ffi-postgres)
 
 [1]: https://www.postgresql.org/docs/current/static/libpq.html
 
