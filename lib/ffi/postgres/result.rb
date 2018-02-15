@@ -40,7 +40,7 @@ module FFI
 			end
 			
 			def get_row(row)
-				column_count.collect{|j| get_value(row, j)}
+				column_count.times.collect{|j| get_value(row, j)}
 			end
 			
 			def each
