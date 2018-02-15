@@ -13,7 +13,7 @@ RSpec.describe FFI::Postgres::Lib do
 	
 	it "should execute query" do
 		connection.query("SELECT 42 AS LIFE") do |results|
-			puts results.inspect
+			puts results.each.to_a
 		end
 	end
 end

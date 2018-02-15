@@ -18,24 +18,38 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative '../lib'
+require_relative 'lib/result'
 
 module FFI
 	module Postgres
-		module Lib
-			# Submits a command to the server without waiting for the result(s). 1 is returned if the command was successfully dispatched and 0 if not (in which case, use PQerrorMessage to get more information about the failure).
-			attach_function :send_query, :PQsendQuery, [:pointer, :string], :int
+		class Result < Pointer
+			def column_count
+				Lib.result_column_count(self)
+			end
 			
+			def column_names
+				column_count.times.collect{|i| Lib.result_column_name(self, i)}
+			end
 			
-			attach_function :get_result, :PQgetResult, [:pointer], :pointer
+			def row_count
+				Lib.result_row_count(self)
+			end
 			
-			# If input is available from the server, consume it:
-			attach_function :consume_input, :PQconsumeInput, [:pointer], :int
+			def get_value(row, column)
+				Lib.result_get_value(self, row, column)
+			end
 			
-			# Returns 1 if a command is busy, that is, PQgetResult would block waiting for input. A 0 return indicates that PQgetResult can be called with assurance of not blocking.
-			attach_function :is_busy, :PQisBusy, [:pointer], :int
+			def get_row(row)
+				column_count.collect{|j| get_value(row, j)}
+			end
 			
-			attach_function :clear, :PQclear, [:pointer], :void
+			def each
+				return to_enum unless block_given?
+				
+				row_count.times do |i|
+					yield get_row(i)
+				end
+			end
 		end
 	end
 end

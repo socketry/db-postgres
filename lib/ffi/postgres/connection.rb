@@ -21,6 +21,8 @@
 require_relative 'lib/connection'
 require_relative 'lib/query'
 
+require_relative 'result'
+
 require 'io/wait'
 
 module FFI
@@ -81,7 +83,11 @@ module FFI
 						# Did we finish reading all results?
 						return if result.null?
 						
-						yield result
+						begin
+							yield Result.new(result)
+						ensure
+							Lib.clear(result)
+						end
 					end
 				end
 			end

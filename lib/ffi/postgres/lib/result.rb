@@ -23,19 +23,30 @@ require_relative '../lib'
 module FFI
 	module Postgres
 		module Lib
-			# Submits a command to the server without waiting for the result(s). 1 is returned if the command was successfully dispatched and 0 if not (in which case, use PQerrorMessage to get more information about the failure).
-			attach_function :send_query, :PQsendQuery, [:pointer, :string], :int
+			enum :exec_status, [
+				:empty_query, # empty query string was executed
+				:command_ok, # a query command that doesn't return anything was executed properly by the backend
+				:tuples_ok, #  a query command that returns tuples was executed properly by the backend, PGresult contains the result tuples
+				:copy_out, # Copy Out data transfer in progress
+				:copy_in, # Copy In data transfer in progress
+				:bad_response, # an unexpected response was recv'd from the backend
+				:nonfatal_error, # notice or warning message
+				:fatal_error, # query failed
+				:copy_both, # Copy In/Out data transfer in progress
+				:single_tuple, # single tuple from larger resultset
+			]
 			
+			attach_function :result_status, :PQresultStatus, [:pointer], :exec_status
 			
-			attach_function :get_result, :PQgetResult, [:pointer], :pointer
+			attach_function :result_error_message, :PQresultErrorMessage, [:pointer], :string
 			
-			# If input is available from the server, consume it:
-			attach_function :consume_input, :PQconsumeInput, [:pointer], :int
+			attach_function :result_row_count, :PQntuples, [:pointer], :int
 			
-			# Returns 1 if a command is busy, that is, PQgetResult would block waiting for input. A 0 return indicates that PQgetResult can be called with assurance of not blocking.
-			attach_function :is_busy, :PQisBusy, [:pointer], :int
+			attach_function :result_column_count, :PQnfields, [:pointer], :int
 			
-			attach_function :clear, :PQclear, [:pointer], :void
+			attach_function :result_column_name, :PQfname, [:pointer, :int], :string
+			
+			attach_function :result_get_value, :PQgetvalue, [:pointer, :int, :int], :string
 		end
 	end
 end
