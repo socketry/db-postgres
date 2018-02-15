@@ -1,12 +1,14 @@
 
+require 'ffi/postgres/connection'
+
 RSpec.describe FFI::Postgres::Lib do
+	let(:connection_string) {"host=localhost dbname=test"}
+	
 	it "should connect to local postgres" do
-		connection = FFI::Postgres::Lib.connect("host=localhost dbname=test")
+		connection = FFI::Postgres::Connection.connect(connection_string)
 		
-		status = FFI::Postgres::Lib.status(connection)
+		expect(connection.status).to be == :ok
 		
-		expect(status).to be == :ok
-		
-		FFI::Postgres::Lib.finish(connection)
+		connection.close
 	end
 end

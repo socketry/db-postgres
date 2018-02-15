@@ -26,6 +26,8 @@ module FFI
 			attach_function :connect, :PQconnectdb, [:string], :pointer
 			attach_function :finish, :PQfinish, [:pointer], :void
 			
+			attach_function :error_message, :PQerrorMessage, [:pointer], :string
+			
 			enum :status, [
 				# Normal mode:
 				:ok,

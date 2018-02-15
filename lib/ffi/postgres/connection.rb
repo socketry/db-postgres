@@ -18,31 +18,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'ffi'
-require 'rbconfig'
+require_relative 'lib/connection'
 
-module FFI::Postgres
-	class Error < StandardError
-	end
-
-	def self.platform
-		os = RbConfig::CONFIG["host_os"]
-
-		case os
-		when /darwin/
-			:darwin
-		when /linux/
-			:linux
-		when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
-			:windows
-		else
-			os
+module FFI
+	module Postgres
+		class Connection < Pointer
+			def self.connect(connection_string = "")
+				pointer = Lib.connect(connection_string)
+				
+				return self.new(pointer)
+			end
+			
+			def status
+				Lib.status(self)
+			end
+			
+			def error_message
+				Lib.error_message(self)
+			end
+			
+			def close
+				Lib.finish(self)
+			end
 		end
 	end
 end
-
-# Load the shared object:
-require_relative 'postgres/lib'
-
-# Wrappers around C functionality:
-require_relative 'postgres/connection'
