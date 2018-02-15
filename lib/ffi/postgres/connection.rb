@@ -77,6 +77,10 @@ module FFI
 					
 					while Lib.is_busy(self) == 0
 						result = Lib.get_result(self)
+						
+						# Did we finish reading all results?
+						return if result.null?
+						
 						yield result
 					end
 				end
