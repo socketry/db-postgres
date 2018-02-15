@@ -23,8 +23,21 @@ require_relative '../lib'
 module FFI
 	module Postgres
 		module Lib
+			# Synchronous connection.
 			attach_function :connect, :PQconnectdb, [:string], :pointer
 			attach_function :finish, :PQfinish, [:pointer], :void
+			
+			# Asyncronous connection.
+			attach_function :connect_start, :PQconnectStart, [:string], :pointer
+			
+			enum :polling_status, [
+				:failed,
+				:wait_readable,
+				:wait_writable,
+				:ok,
+			]
+			
+			attach_function :connect_poll, :PQconnectPoll, [:pointer], :polling_status
 			
 			attach_function :error_message, :PQerrorMessage, [:pointer], :string
 			

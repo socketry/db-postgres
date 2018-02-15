@@ -20,11 +20,22 @@
 
 require_relative 'lib/connection'
 
+require 'io/wait'
+
 module FFI
 	module Postgres
 		class Connection < Pointer
-			def self.connect(connection_string = "")
-				pointer = Lib.connect(connection_string)
+			def self.connect(connection_string = "", io: ::IO)
+				pointer = Lib.connect_start(connection_string)
+				
+				io = io.new(Lib.socket(pointer), "r+")
+				
+				while status = Lib.connect_poll(pointer)
+					break if status == :ok || status == :failed
+					
+					# one of :wait_readable or :wait_writable
+					io.send(status)
+				end
 				
 				return self.new(pointer)
 			end
