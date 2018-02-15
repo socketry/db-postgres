@@ -29,14 +29,22 @@ module FFI
 				return self.new(pointer)
 			end
 			
+			# Return the status of the connection.
 			def status
 				Lib.status(self)
 			end
 			
+			# Return the last error message.
 			def error_message
 				Lib.error_message(self)
 			end
 			
+			# Return the underlying socket used for IO.
+			def socket
+				Lib.socket(self)
+			end
+			
+			# Close the connection.
 			def close
 				Lib.finish(self)
 			end
