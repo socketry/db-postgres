@@ -26,7 +26,26 @@ module FFI
 			attach_function :connect, :PQconnectdb, [:string], :pointer
 			attach_function :finish, :PQfinish, [:pointer], :void
 			
-			attach_function :status, :PQstatus, [:pointer], :int
+			enum :status, [
+				# Normal mode:
+				:ok,
+				:bad,
+				
+				# Non-blocking mode:
+				:started, # Waiting for connection to be made.
+				:made, # Connection OK; waiting to send.
+				:awaiting_response, #Waiting for a response from the postmaster.
+				:auth_ok, # Received authentication; waiting for backend startup.
+				:setenv, # Negotiating environment.
+				:ssl_startup, # Negotiating SSL.
+				:needed, # Internal state: connect() needed
+				:check_writable, # Check if we could make a writable connection.
+				:consume, # Wait for any pending message and consume them.
+			]
+			
+			attach_function :status, :PQstatus, [:pointer], :status
+			
+			attach_function :socket, :PQsocket, [:pointer], :int
 		end
 	end
 end
