@@ -23,24 +23,24 @@ require_relative 'lib/result'
 module FFI
 	module Postgres
 		class Result < Pointer
-			def column_count
-				Lib.result_column_count(self)
+			def field_count
+				Lib.result_field_count(self)
 			end
 			
-			def column_names
-				column_count.times.collect{|i| Lib.result_column_name(self, i)}
+			def field_names
+				field_count.times.collect{|i| Lib.result_field_name(self, i)}
 			end
 			
 			def row_count
 				Lib.result_row_count(self)
 			end
 			
-			def get_value(row, column)
-				Lib.result_get_value(self, row, column)
+			def get_value(row, field)
+				Lib.result_get_value(self, row, field)
 			end
 			
 			def get_row(row)
-				column_count.times.collect{|j| get_value(row, j)}
+				field_count.times.collect{|j| get_value(row, j)}
 			end
 			
 			def each

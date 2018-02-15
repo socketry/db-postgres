@@ -42,9 +42,9 @@ module FFI
 			
 			attach_function :result_row_count, :PQntuples, [:pointer], :int
 			
-			attach_function :result_column_count, :PQnfields, [:pointer], :int
+			attach_function :result_field_count, :PQnfields, [:pointer], :int
 			
-			attach_function :result_column_name, :PQfname, [:pointer, :int], :string
+			attach_function :result_field_name, :PQfname, [:pointer, :int], :string
 			
 			attach_function :result_get_value, :PQgetvalue, [:pointer, :int, :int], :string
 		end
