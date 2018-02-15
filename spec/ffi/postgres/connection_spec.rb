@@ -1,7 +1,7 @@
 
 RSpec.describe FFI::Postgres::Lib do
 	it "should connect to local postgres" do
-		connection = FFI::Postgres::Lib.connect("host=localhost")
+		connection = FFI::Postgres::Lib.connect("host=localhost dbname=test")
 		
 		status = FFI::Postgres::Lib.status(connection)
 		
