@@ -26,6 +26,11 @@ module FFI
 			# Submits a command to the server without waiting for the result(s). 1 is returned if the command was successfully dispatched and 0 if not (in which case, use PQerrorMessage to get more information about the failure).
 			attach_function :send_query, :PQsendQuery, [:pointer, :string], :int
 			
+			# int PQsendQueryParams(PGconn *conn, const char *command, int nParams, const Oid *paramTypes, const char * const *paramValues, const int *paramLengths, const int *paramFormats, int resultFormat);
+			attach_function :send_query_params, :PQsendQueryParams, [:pointer, :string, :int, :pointer, :pointer, :pointer, :pointer, :int], :int
+			
+			attach_function :set_single_row_mode, :PQsetSingleRowMode, [:pointer], :int
+			
 			attach_function :get_result, :PQgetResult, [:pointer], :pointer
 			
 			# If input is available from the server, consume it:

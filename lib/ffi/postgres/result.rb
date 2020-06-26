@@ -49,6 +49,10 @@ module FFI
 				field_count.times.collect{|j| get_value(row, j)}
 			end
 			
+			alias count row_count
+			alias [] get_row
+			alias keys field_names
+			
 			def each
 				return to_enum unless block_given?
 				

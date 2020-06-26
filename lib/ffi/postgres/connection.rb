@@ -71,28 +71,32 @@ module FFI
 				Native.finish(self)
 			end
 			
-			def query(string)
-				check! Native.send_query(self, string)
+			def single_row_mode!
+				Native.set_single_row_mode(self)
+			end
+			
+			def send_query(statement)
+				check! Native.send_query(self, statement)
 				
 				self.flush
-				
+			end
+			
+			def next_result
 				while true
-					@io.wait_readable
-					
 					check! Native.consume_input(self)
 					
 					while Native.is_busy(self) == 0
 						result = Native.get_result(self)
 						
 						# Did we finish reading all results?
-						return if result.null?
-						
-						# begin
-							yield Result.new(result)
-						# ensure
-						# 	Native.clear(result)
-						# end
+						if result.null?
+							return nil
+						else
+							return Result.new(result)
+						end
 					end
+					
+					@io.wait_readable
 				end
 			end
 			
