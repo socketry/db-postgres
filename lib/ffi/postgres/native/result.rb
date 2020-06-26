@@ -18,11 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative '../lib'
+require_relative '../native'
 
 module FFI
 	module Postgres
-		module Lib
+		module Native
 			enum :exec_status, [
 				:empty_query, # empty query string was executed
 				:command_ok, # a query command that doesn't return anything was executed properly by the backend

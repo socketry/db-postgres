@@ -18,11 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'mkmf'
+require 'ffi/library'
 
 module FFI
 	module Postgres
-		module Lib
+		module Native
 			extend FFI::Library
 			
 			ffi_lib 'pq'

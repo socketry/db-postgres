@@ -18,8 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'lib/connection'
-require_relative 'lib/query'
+require_relative 'native/connection'
+require_relative 'native/query'
 
 require_relative 'result'
 
@@ -35,68 +35,86 @@ module FFI
 			end
 			
 			def self.connect(connection_string = "", io: ::IO)
-				pointer = Lib.connect_start(connection_string)
+				pointer = Native.connect_start(connection_string)
 				
-				io = io.new(Lib.socket(pointer), "r+")
+				io = io.new(Native.socket(pointer), "r+")
 				
-				while status = Lib.connect_poll(pointer)
+				while status = Native.connect_poll(pointer)
 					break if status == :ok || status == :failed
 					
 					# one of :wait_readable or :wait_writable
 					io.send(status)
 				end
 				
+				Native.set_nonblocking(pointer, 1)
+				
 				return self.new(pointer, io)
 			end
 			
 			# Return the status of the connection.
 			def status
-				Lib.status(self)
+				Native.status(self)
 			end
 			
 			# Return the last error message.
 			def error_message
-				Lib.error_message(self)
+				Native.error_message(self)
 			end
 			
 			# Return the underlying socket used for IO.
 			def socket
-				Lib.socket(self)
+				Native.socket(self)
 			end
 			
 			# Close the connection.
 			def close
-				Lib.finish(self)
+				Native.finish(self)
 			end
 			
 			def query(string)
-				check! Lib.send_query(self, string)
+				check! Native.send_query(self, string)
+				
+				self.flush
 				
 				while true
 					@io.wait_readable
 					
-					check! Lib.consume_input(self)
+					check! Native.consume_input(self)
 					
-					while Lib.is_busy(self) == 0
-						result = Lib.get_result(self)
+					while Native.is_busy(self) == 0
+						result = Native.get_result(self)
 						
 						# Did we finish reading all results?
 						return if result.null?
 						
-						begin
+						# begin
 							yield Result.new(result)
-						ensure
-							Lib.clear(result)
-						end
+						# ensure
+						# 	Native.clear(result)
+						# end
 					end
 				end
 			end
-				
+			
 			private
+			
+			# After sending any command or data on a nonblocking connection, call PQflush. If it returns 1, wait for the socket to become read- or write-ready. If it becomes write-ready, call PQflush again. If it becomes read-ready, call PQconsumeInput, then call PQflush again. Repeat until PQflush returns 0. (It is necessary to check for read-ready and drain the input with PQconsumeInput, because the server can block trying to send us data, e.g. NOTICE messages, and won't read our data until we read its.) Once PQflush returns 0, wait for the socket to be read-ready and then read the response as described above.
+			def flush
+				while true
+					case Native.flush(self)
+					when 1
+						@io.wait_any
+						
+						check! Native.consume_input(self)
+					when 0
+						return
+					end
+				end
+			end
 			
 			def check! result
 				if result == 0
-					message = Lib.error_message(self)
+					message = Native.error_message(self)
 					raise Error.new(message)
 				end
 			end

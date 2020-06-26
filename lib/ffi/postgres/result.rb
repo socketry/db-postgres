@@ -18,25 +18,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'lib/result'
+require_relative 'native/result'
 
 module FFI
 	module Postgres
 		class Result < Pointer
+			def initialize(*)
+				super
+				
+				ObjectSpace.define_finalizer(self, Native.method(:clear))
+			end
+			
 			def field_count
-				Lib.result_field_count(self)
+				Native.result_field_count(self)
 			end
 			
 			def field_names
-				field_count.times.collect{|i| Lib.result_field_name(self, i)}
+				field_count.times.collect{|i| Native.result_field_name(self, i)}
 			end
 			
 			def row_count
-				Lib.result_row_count(self)
+				Native.result_row_count(self)
 			end
 			
 			def get_value(row, field)
-				Lib.result_get_value(self, row, field)
+				Native.result_get_value(self, row, field)
 			end
 			
 			def get_row(row)

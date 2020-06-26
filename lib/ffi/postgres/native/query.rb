@@ -18,14 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative '../lib'
+require_relative '../native'
 
 module FFI
 	module Postgres
-		module Lib
+		module Native
 			# Submits a command to the server without waiting for the result(s). 1 is returned if the command was successfully dispatched and 0 if not (in which case, use PQerrorMessage to get more information about the failure).
 			attach_function :send_query, :PQsendQuery, [:pointer, :string], :int
-			
 			
 			attach_function :get_result, :PQgetResult, [:pointer], :pointer
 			

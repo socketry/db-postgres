@@ -18,11 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative '../lib'
+require_relative '../native'
 
 module FFI
 	module Postgres
-		module Lib
+		module Native
 			# Synchronous connection.
 			attach_function :connect, :PQconnectdb, [:string], :pointer
 			attach_function :finish, :PQfinish, [:pointer], :void
@@ -61,6 +61,9 @@ module FFI
 			attach_function :status, :PQstatus, [:pointer], :status
 			
 			attach_function :socket, :PQsocket, [:pointer], :int
+			
+			attach_function :set_nonblocking, :PQsetnonblocking, [:pointer, :int], :int
+			attach_function :flush, :PQflush, [:pointer], :int
 		end
 	end
 end

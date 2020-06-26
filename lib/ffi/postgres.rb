@@ -42,7 +42,7 @@ module FFI::Postgres
 end
 
 # Load the shared object:
-require_relative 'postgres/lib'
+require_relative 'postgres/native'
 
 # Wrappers around C functionality:
 require_relative 'postgres/connection'
