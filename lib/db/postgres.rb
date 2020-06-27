@@ -18,29 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'ffi'
-require 'rbconfig'
-
-module FFI::Postgres
-	class Error < StandardError
-	end
-
-	def self.platform
-		os = RbConfig::CONFIG["host_os"]
-
-		case os
-		when /darwin/
-			:darwin
-		when /linux/
-			:linux
-		when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
-			:windows
-		else
-			os
-		end
-	end
-end
-
 # Load the shared object:
 require_relative 'postgres/native'
 

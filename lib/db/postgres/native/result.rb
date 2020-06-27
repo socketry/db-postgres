@@ -47,6 +47,46 @@ module FFI
 			attach_function :result_field_name, :PQfname, [:pointer, :int], :string
 			
 			attach_function :result_get_value, :PQgetvalue, [:pointer, :int, :int], :string
+			
+			class Result < Pointer
+				def initialize(*)
+					super
+					
+					ObjectSpace.define_finalizer(self, Native.method(:clear))
+				end
+				
+				def field_count
+					Native.result_field_count(self)
+				end
+				
+				def field_names
+					field_count.times.collect{|i| Native.result_field_name(self, i)}
+				end
+				
+				def row_count
+					Native.result_row_count(self)
+				end
+				
+				def get_value(row, field)
+					Native.result_get_value(self, row, field)
+				end
+				
+				def get_row(row)
+					field_count.times.collect{|j| get_value(row, j)}
+				end
+				
+				alias count row_count
+				alias [] get_row
+				alias keys field_names
+				
+				def each
+					return to_enum unless block_given?
+					
+					row_count.times do |i|
+						yield get_row(i)
+					end
+				end
+			end
 		end
 	end
 end

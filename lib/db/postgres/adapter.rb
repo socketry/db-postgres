@@ -1,4 +1,6 @@
-# Copyright, 2018, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# frozen_string_literal: true
+
+# Copyright, 2020, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,47 +20,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'native/result'
+require_relative 'connection'
 
-module FFI
+module DB
 	module Postgres
-		class Result < Pointer
-			def initialize(*)
-				super
-				
-				ObjectSpace.define_finalizer(self, Native.method(:clear))
+		LOCAL = "postgres://localhost/postgres"
+		
+		class Adapter
+			def initialize(connection_string = LOCAL)
+				@connection_string = connection_string
 			end
 			
-			def field_count
-				Native.result_field_count(self)
-			end
+			attr :connection_string
 			
-			def field_names
-				field_count.times.collect{|i| Native.result_field_name(self, i)}
-			end
-			
-			def row_count
-				Native.result_row_count(self)
-			end
-			
-			def get_value(row, field)
-				Native.result_get_value(self, row, field)
-			end
-			
-			def get_row(row)
-				field_count.times.collect{|j| get_value(row, j)}
-			end
-			
-			alias count row_count
-			alias [] get_row
-			alias keys field_names
-			
-			def each
-				return to_enum unless block_given?
-				
-				row_count.times do |i|
-					yield get_row(i)
-				end
+			def call
+				Connection.new(self.connection_string)
 			end
 		end
 	end
