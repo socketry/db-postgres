@@ -23,19 +23,18 @@
 require 'async/pool/resource'
 require_relative 'native/connection'
 
-
 module DB
 	module Postgres
 		module IO
 			def self.new(fd, mode)
-				Async::IO::Generic.new(::IO.new(fd, mode))
+				Async::IO::Generic.new(::IO.new(fd, mode, autoclose: false))
 			end
 		end
 		
 		# This implements the interface between the underlying 
 		class Connection < Async::Pool::Resource
 			def initialize(connection_string)
-				@wrapper = Native::Connection.connect(
+				@native = Native::Connection.connect(
 					connection_string, io: IO
 				)
 				
@@ -43,21 +42,21 @@ module DB
 			end
 			
 			def send_query(statement)
-				@wrapper.send_query(statement)
+				@native.send_query(statement)
 			end
 			
 			def next_result
-				@wrapper.next_result
+				@native.next_result
 			end
 			
 			def call(statement, streaming: false)
-				@wrapper.send_query(statement)
+				@native.send_query(statement)
 				
-				@wrapper.single_row_mode! if streaming
+				@native.single_row_mode! if streaming
 				
 				last_result = nil
 				
-				while result = @wrapper.next_result
+				while result = @native.next_result
 					last_result = result
 				end
 				

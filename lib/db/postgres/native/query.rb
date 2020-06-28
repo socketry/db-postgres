@@ -38,8 +38,6 @@ module DB
 			
 			# Returns 1 if a command is busy, that is, PQgetResult would block waiting for input. A 0 return indicates that PQgetResult can be called with assurance of not blocking.
 			attach_function :is_busy, :PQisBusy, [:pointer], :int
-			
-			attach_function :clear, :PQclear, [:pointer], :void
 		end
 	end
 end
