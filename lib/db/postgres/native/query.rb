@@ -20,7 +20,7 @@
 
 require_relative '../native'
 
-module FFI
+module DB
 	module Postgres
 		module Native
 			# Submits a command to the server without waiting for the result(s). 1 is returned if the command was successfully dispatched and 0 if not (in which case, use PQerrorMessage to get more information about the failure).

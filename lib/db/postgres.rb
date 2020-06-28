@@ -18,8 +18,5 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-# Load the shared object:
 require_relative 'postgres/native'
-
-# Wrappers around C functionality:
 require_relative 'postgres/connection'

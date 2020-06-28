@@ -18,9 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'ffi/library'
+require 'ffi'
 
-module FFI
+module DB
 	module Postgres
 		module Native
 			extend FFI::Library

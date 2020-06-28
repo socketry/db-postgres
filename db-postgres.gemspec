@@ -1,9 +1,9 @@
 
-require_relative "lib/ffi/postgres/version"
+require_relative "lib/db/postgres/version"
 
 Gem::Specification.new do |spec|
-	spec.name = "ffi-postgres"
-	spec.version = FFI::Postgres::VERSION
+	spec.name = "db-postgres"
+	spec.version = DB::Postgres::VERSION
 	
 	spec.summary = "Ruby FFI bindings for libpq C interface."
 	spec.authors = ["Samuel Williams"]

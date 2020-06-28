@@ -21,7 +21,8 @@
 # THE SOFTWARE.
 
 require 'async/pool/resource'
-require 'ffi/postgres'
+require_relative 'native/connection'
+
 
 module DB
 	module Postgres
@@ -34,7 +35,7 @@ module DB
 		# This implements the interface between the underlying 
 		class Connection < Async::Pool::Resource
 			def initialize(connection_string)
-				@wrapper = FFI::Postgres::Connection.connect(
+				@wrapper = Native::Connection.connect(
 					connection_string, io: IO
 				)
 				

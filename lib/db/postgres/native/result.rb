@@ -20,7 +20,7 @@
 
 require_relative '../native'
 
-module FFI
+module DB
 	module Postgres
 		module Native
 			enum :exec_status, [
@@ -48,7 +48,7 @@ module FFI
 			
 			attach_function :result_get_value, :PQgetvalue, [:pointer, :int, :int], :string
 			
-			class Result < Pointer
+			class Result < FFI::Pointer
 				def initialize(*)
 					super
 					

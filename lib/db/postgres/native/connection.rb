@@ -18,9 +18,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative '../native'
+require_relative 'query'
+require_relative 'result'
 
-module FFI
+module DB
 	module Postgres
 		module Native
 			# Synchronous connection.
@@ -65,7 +66,7 @@ module FFI
 			attach_function :set_nonblocking, :PQsetnonblocking, [:pointer, :int], :int
 			attach_function :flush, :PQflush, [:pointer], :int
 			
-			class Connection < Pointer
+			class Connection < FFI::Pointer
 				def initialize(address, io)
 					super(address)
 					
