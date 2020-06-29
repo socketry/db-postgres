@@ -38,7 +38,7 @@ module DB
 			
 			attach_function :result_status, :PQresultStatus, [:pointer], :exec_status
 			
-			attach_function :error_message, :PQresultErrorMessage, [:pointer], :string
+			attach_function :result_error_message, :PQresultErrorMessage, [:pointer], :string
 			
 			attach_function :row_count, :PQntuples, [:pointer], :int
 			
