@@ -18,17 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'query'
 require_relative 'result'
 
 module DB
 	module Postgres
 		module Native
-			# Synchronous connection.
-			attach_function :connect, :PQconnectdb, [:string], :pointer
-			attach_function :finish, :PQfinish, [:pointer], :void
-			
-			# Asyncronous connection.
 			attach_function :connect_start, :PQconnectStart, [:string], :pointer
 			
 			enum :polling_status, [
@@ -39,6 +33,9 @@ module DB
 			]
 			
 			attach_function :connect_poll, :PQconnectPoll, [:pointer], :polling_status
+			
+			# Close the connection and release underlying resources.
+			attach_function :finish, :PQfinish, [:pointer], :void
 			
 			attach_function :error_message, :PQerrorMessage, [:pointer], :string
 			
@@ -66,6 +63,22 @@ module DB
 			attach_function :set_nonblocking, :PQsetnonblocking, [:pointer, :int], :int
 			attach_function :flush, :PQflush, [:pointer], :int
 			
+			# Submits a command to the server without waiting for the result(s). 1 is returned if the command was successfully dispatched and 0 if not (in which case, use PQerrorMessage to get more information about the failure).
+			attach_function :send_query, :PQsendQuery, [:pointer, :string], :int
+			
+			# int PQsendQueryParams(PGconn *conn, const char *command, int nParams, const Oid *paramTypes, const char * const *paramValues, const int *paramLengths, const int *paramFormats, int resultFormat);
+			attach_function :send_query_params, :PQsendQueryParams, [:pointer, :string, :int, :pointer, :pointer, :pointer, :pointer, :int], :int
+			
+			attach_function :set_single_row_mode, :PQsetSingleRowMode, [:pointer], :int
+			
+			attach_function :get_result, :PQgetResult, [:pointer], :pointer
+			
+			# If input is available from the server, consume it:
+			attach_function :consume_input, :PQconsumeInput, [:pointer], :int
+			
+			# Returns 1 if a command is busy, that is, PQgetResult would block waiting for input. A 0 return indicates that PQgetResult can be called with assurance of not blocking.
+			attach_function :is_busy, :PQisBusy, [:pointer], :int
+			
 			class Connection < FFI::Pointer
 				def initialize(address, io)
 					super(address)
@@ -83,6 +96,16 @@ module DB
 						
 						# one of :wait_readable or :wait_writable
 						io.send(status)
+					end
+					
+					if status == :failed
+						io.close
+						
+						error_message = Native.error_message(pointer)
+						
+						Native.finish(pointer)
+						
+						raise "connect: #{error_message}"
 					end
 					
 					Native.set_nonblocking(pointer, 1)
