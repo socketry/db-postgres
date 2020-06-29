@@ -1,4 +1,4 @@
-# FFI::Postgres
+# DB::Postgres
 
 A light-weight wrapper for Ruby exposing [libpq](https://www.postgresql.org/docs/current/static/libpq.html).
 
