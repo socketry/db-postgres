@@ -26,7 +26,7 @@ require 'async/rspec'
 RSpec.describe DB::Postgres::Connection do
 	include_context Async::RSpec::Reactor
 	
-	let(:connection_string) {"host=localhost dbname=test"}
+	let(:connection_string) {"dbname=test"}
 	subject(:connection) {DB::Postgres::Connection.new(connection_string)}
 	
 	it "should connect to local postgres" do

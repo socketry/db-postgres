@@ -11,7 +11,6 @@ jobs:
       matrix:
         os:
           - ubuntu
-          # - macos
         
         ruby:
           - 2.5
@@ -41,17 +40,18 @@ jobs:
     - name: Install dependencies
       run: ${{matrix.env}} bundle install
     
-    - name: Installing packages (ubuntu)
+    - name: Preparing environment (ubuntu)
       if: matrix.os == 'ubuntu'
-      run: sudo apt-get install postgresql postgresql-contrib
+      run: |
+        sudo apt-get install postgresql postgresql-contrib
+        echo "local all all trust" | sudo tee -a /var/lib/postgresql/12/main/pg_hba.conf
+        sudo systemctl restart postgresql
+        sudo -u postgres createuser -s -d $(id -un)
+        sudo -u postgres createdb test
     
-    - name: Installing packages (macos)
+    - name: Preparing environment (macos)
       if: matrix.os == 'macos'
       run: brew install mariadb
-    
-    - name: Setup database
-      run: |
-        sudo systemctl start postgresql
     
     - name: Run tests
       timeout-minutes: 5
