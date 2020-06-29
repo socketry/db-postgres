@@ -142,7 +142,7 @@ module DB
 				def send_query(statement)
 					check! Native.send_query(self, statement)
 					
-					self.flush
+					flush
 				end
 				
 				def next_result
@@ -164,7 +164,7 @@ module DB
 					end
 				end
 				
-				private
+				protected
 				
 				# After sending any command or data on a nonblocking connection, call PQflush. If it returns 1, wait for the socket to become read- or write-ready. If it becomes write-ready, call PQflush again. If it becomes read-ready, call PQconsumeInput, then call PQflush again. Repeat until PQflush returns 0. (It is necessary to check for read-ready and drain the input with PQconsumeInput, because the server can block trying to send us data, e.g. NOTICE messages, and won't read our data until we read its.) Once PQflush returns 0, wait for the socket to be read-ready and then read the response as described above.
 				def flush
