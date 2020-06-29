@@ -20,21 +20,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'ffi/postgres/connection'
+require 'db/postgres/connection'
+require 'async/rspec'
 
-RSpec.describe FFI::Postgres::Lib do
+RSpec.describe DB::Postgres::Connection do
+	include_context Async::RSpec::Reactor
+	
 	let(:connection_string) {"host=localhost dbname=test"}
-	let(:connection) {FFI::Postgres::Connection.connect(connection_string)}
+	subject(:connection) {DB::Postgres::Connection.new(connection_string)}
 	
 	it "should connect to local postgres" do
 		expect(connection.status).to be == :ok
-		
+	ensure
 		connection.close
 	end
 	
 	it "should execute query" do
-		connection.query("SELECT 42 AS LIFE") do |results|
-			expect(results.each.to_a).to be == [["42"]]
-		end
+		connection.send_query("SELECT 42 AS LIFE")
+		
+		result = connection.next_result
+		
+		expect(result.to_a).to be == [['42']]
+	ensure
+		connection.close
 	end
 end

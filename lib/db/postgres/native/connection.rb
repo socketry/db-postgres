@@ -108,6 +108,8 @@ module DB
 				# Close the connection.
 				def close
 					Native.finish(self)
+					
+					@io.close
 				end
 				
 				def single_row_mode!

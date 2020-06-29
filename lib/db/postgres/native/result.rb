@@ -36,9 +36,9 @@ module DB
 				:single_tuple, # single tuple from larger resultset
 			]
 			
-			attach_function :status, :PQresultStatus, [:pointer], :exec_status
+			attach_function :result_status, :PQresultStatus, [:pointer], :exec_status
 			
-			attach_function :error_message, :PQresultErrorMessage, [:pointer], :string
+			attach_function :result_error_message, :PQresultErrorMessage, [:pointer], :string
 			
 			attach_function :row_count, :PQntuples, [:pointer], :int
 			
@@ -69,6 +69,16 @@ module DB
 					end
 					
 					Native.clear(self)
+				end
+				
+				def to_a
+					rows = []
+					
+					self.each do |row|
+						rows << row
+					end
+					
+					return rows
 				end
 				
 			protected

@@ -23,6 +23,8 @@
 require 'async/pool/resource'
 require_relative 'native/connection'
 
+require 'async/io/generic'
+
 module DB
 	module Postgres
 		module IO
@@ -39,6 +41,16 @@ module DB
 				)
 				
 				super()
+			end
+			
+			def close
+				@native.close
+				
+				super
+			end
+			
+			def status
+				@native.status
 			end
 			
 			def send_query(statement)

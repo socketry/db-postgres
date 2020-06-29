@@ -11,7 +11,7 @@ jobs:
       matrix:
         os:
           - ubuntu
-          - macos
+          # - macos
         
         ruby:
           - 2.5
@@ -39,8 +39,21 @@ jobs:
         ruby-version: ${{matrix.ruby}}
     
     - name: Install dependencies
-      run: ${{matrix.env}} bundle install --without development
+      run: ${{matrix.env}} bundle install
+    
+    - name: Installing packages (ubuntu)
+      if: matrix.os == 'ubuntu'
+      run: sudo apt-get install postgresql postgresql-contrib
+    
+    - name: Installing packages (macos)
+      if: matrix.os == 'macos'
+      run: brew install mariadb
+    
+    - name: Setup database
+      run: |
+        sudo systemctl start postgresql
     
     - name: Run tests
       timeout-minutes: 5
-      run: ${{matrix.env}} bundle exec rspec
+      run: |
+        ${{matrix.env}} bundle exec rspec
