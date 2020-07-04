@@ -1,6 +1,4 @@
-# frozen_string_literal: true
-
-# Copyright, 2020, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# Copyright, 2018, by Samuel G. D. Williams. <http://www.codeotaku.com>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,58 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'async/pool/resource'
-require_relative 'native/connection'
-
-require 'async/io/generic'
+require_relative '../native'
 
 module DB
 	module Postgres
-		module IO
-			def self.new(fd, mode)
-				Async::IO::Generic.new(::IO.new(fd, mode, autoclose: false))
-			end
-		end
-		
-		# This implements the interface between the underlying 
-		class Connection < Async::Pool::Resource
-			def initialize(**options)
-				@native = Native::Connection.connect(**options)
-				
-				super()
-			end
-			
-			def close
-				@native.close
-				
-				super
-			end
-			
-			def status
-				@native.status
-			end
-			
-			def send_query(statement)
-				@native.send_query(statement)
-			end
-			
-			def next_result
-				@native.next_result
-			end
-			
-			def call(statement, streaming: false)
-				@native.send_query(statement)
-				
-				@native.single_row_mode! if streaming
-				
-				last_result = nil
-				
-				while result = @native.next_result
-					last_result = result
-				end
-				
-				return last_result
-			end
+		module Native
+			DEFAULT_TYPES = {
+			}
 		end
 	end
 end

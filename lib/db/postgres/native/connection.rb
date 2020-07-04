@@ -19,11 +19,12 @@
 # THE SOFTWARE.
 
 require_relative 'result'
+require_relative 'field'
 
 module DB
 	module Postgres
 		module Native
-			attach_function :connect_start, :PQconnectStart, [:string], :pointer
+			attach_function :connect_start_params, :PQconnectStartParams, [:pointer, :pointer, :int], :pointer
 			
 			enum :polling_status, [
 				:failed,
@@ -86,8 +87,18 @@ module DB
 					@io = io
 				end
 				
-				def self.connect(connection_string = "", io: ::IO)
-					pointer = Native.connect_start(connection_string)
+				def self.connect(io: IO, types: DEFAULT_TYPES, **options)
+					# Prefer 'database' key for 'dbname' parameter:
+					if database = options.delete(:database)
+						options[:dbname] = database
+					end
+					
+					keys = FFI::MemoryPointer.new(:pointer, options.size + 1)
+					keys.write_array_of_type(:strptr, :put_pointer, options.keys.map(&:to_s))
+					values = FFI::MemoryPointer.new(:pointer, options.size + 1)
+					values.write_array_of_type(:strptr, :put_pointer, options.values.map(&:to_s))
+					
+					pointer = Native.connect_start_params(keys, values, 0)
 					
 					io = io.new(Native.socket(pointer), "r+")
 					
