@@ -93,10 +93,12 @@ module DB
 						options[:dbname] = database
 					end
 					
+					
+					
 					keys = FFI::MemoryPointer.new(:pointer, options.size + 1)
-					keys.write_array_of_type(:strptr, :put_pointer, options.keys.map(&:to_s))
+					keys.write_array_of_type(:string, :put_pointer, options.keys.map{|key| FFI::MemoryPointer.from_string(key.to_s)})
 					values = FFI::MemoryPointer.new(:pointer, options.size + 1)
-					values.write_array_of_type(:strptr, :put_pointer, options.values.map(&:to_s))
+					values.write_array_of_type(:string, :put_pointer, options.values.map{|value| FFI::MemoryPointer.from_string(value.to_s)})
 					
 					pointer = Native.connect_start_params(keys, values, 0)
 					
