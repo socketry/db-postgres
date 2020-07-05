@@ -92,13 +92,10 @@ module DB
 			# Returns 1 if a command is busy, that is, PQgetResult would block waiting for input. A 0 return indicates that PQgetResult can be called with assurance of not blocking.
 			attach_function :is_busy, :PQisBusy, [:pointer], :int
 			
+			attach_function :escape_literal, :PQescapeLiteral, [:pointer, :string, :size_t], :pointer
+			attach_function :escape_identifier, :PQescapeIdentifier, [:pointer, :string, :size_t], :pointer
+			
 			class Connection < FFI::Pointer
-				def initialize(address, io)
-					super(address)
-					
-					@io = io
-				end
-				
 				def self.connect(io: IO, types: DEFAULT_TYPES, **options)
 					# Prefer 'database' key for 'dbname' parameter:
 					if database = options.delete(:database)
@@ -131,7 +128,14 @@ module DB
 					
 					Native.set_nonblocking(pointer, 1)
 					
-					return self.new(pointer, io)
+					return self.new(pointer, io, types)
+				end
+				
+				def initialize(address, io, types)
+					super(address)
+					
+					@io = io
+					@types = types
 				end
 				
 				# Return the status of the connection.
@@ -156,6 +160,30 @@ module DB
 					@io.close
 				end
 				
+				def escape_literal(value)
+					value = value.to_s
+					
+					result = Native.escape_literal(self, value, value.bytesize)
+					
+					string = result.read_string
+					
+					Native.free_memory(result)
+					
+					return string
+				end
+				
+				def escape_identifier(value)
+					value = value.to_s
+					
+					result = Native.escape_identifier(self, value, value.bytesize)
+					
+					string = result.read_string
+					
+					Native.free_memory(result)
+					
+					return string
+				end
+				
 				def single_row_mode!
 					Native.set_single_row_mode(self)
 				end
@@ -166,7 +194,32 @@ module DB
 					flush
 				end
 				
-				def next_result
+				def next_result(types: @types)
+					if result = self.get_result
+						return Result.new(self, types, result)
+					end
+				end
+				
+				# Silently discard any results that application didn't read.
+				def discard_results
+					while result = self.get_result
+						status = Native.result_status(result)
+						Native.clear(result)
+						
+						case status
+						when :copy_in
+							self.put_copy_end("discard results")
+						when :copy_out
+							self.flush_copy_out
+						end
+					end
+					
+					return nil
+				end
+				
+				protected
+				
+				def get_result
 					while true
 						check! Native.consume_input(self)
 						
@@ -177,7 +230,7 @@ module DB
 							if result.null?
 								return nil
 							else
-								return Result.new(result)
+								return result
 							end
 						end
 						
@@ -185,7 +238,39 @@ module DB
 					end
 				end
 				
-				protected
+				def put_copy_end(message = nil)
+					while true
+						status = Native.put_copy_end(self, message)
+						
+						if status == -1
+							message = Native.error_message(self)
+							raise Error.new(message)
+						elsif status == 0
+							@io.wait_writable
+						else
+							break
+						end
+					end
+				end
+				
+				def flush_copy_out
+					buffer = FFI::MemoryPointer.new(:pointer, 1)
+					
+					while true
+						status = Native.get_copy_data(self, buffer, 1)
+						
+						if status == -2
+							message = Native.error_message(self)
+							raise Error.new(message)
+						elsif status == -1
+							break
+						elsif status == 0
+							@io.wait_readable
+						else
+							Native.free_memory(buffer.read_pointer)
+						end
+					end
+				end
 				
 				# After sending any command or data on a nonblocking connection, call PQflush. If it returns 1, wait for the socket to become read- or write-ready. If it becomes write-ready, call PQflush again. If it becomes read-ready, call PQconsumeInput, then call PQflush again. Repeat until PQflush returns 0. (It is necessary to check for read-ready and drain the input with PQconsumeInput, because the server can block trying to send us data, e.g. NOTICE messages, and won't read our data until we read its.) Once PQflush returns 0, wait for the socket to be read-ready and then read the response as described above.
 				def flush
@@ -201,7 +286,7 @@ module DB
 					end
 				end
 				
-				def check! result
+				def check!(result)
 					if result == 0
 						message = Native.error_message(self)
 						raise Error.new(message)

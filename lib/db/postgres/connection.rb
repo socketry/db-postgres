@@ -47,6 +47,35 @@ module DB
 				super
 			end
 			
+			def append_string(value, buffer = String.new)
+				buffer << @native.escape_literal(value)
+				
+				return buffer
+			end
+			
+			def append_literal(value, buffer = String.new)
+				case value
+				when Numeric
+					buffer << value.to_s
+				when TrueClass
+					buffer << 'TRUE'
+				when FalseClass
+					buffer << 'FALSE'
+				when nil
+					buffer << 'NULL'
+				else
+					append_string(value, buffer)
+				end
+				
+				return buffer
+			end
+			
+			def append_identifier(value, buffer = String.new)
+				buffer << @native.escape_identifier(value)
+				
+				return buffer
+			end
+			
 			def status
 				@native.status
 			end

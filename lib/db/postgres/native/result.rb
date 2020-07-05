@@ -23,7 +23,7 @@ require_relative '../native'
 module DB
 	module Postgres
 		module Native
-			enum :exec_status, [
+			enum :query_status, [
 				:empty_query, # empty query string was executed
 				:command_ok, # a query command that doesn't return anything was executed properly by the backend
 				:tuples_ok, #  a query command that returns tuples was executed properly by the backend, PGresult contains the result tuples
@@ -36,23 +36,37 @@ module DB
 				:single_tuple, # single tuple from larger resultset
 			]
 			
-			attach_function :result_status, :PQresultStatus, [:pointer], :exec_status
-			
+			attach_function :result_status, :PQresultStatus, [:pointer], :query_status
 			attach_function :result_error_message, :PQresultErrorMessage, [:pointer], :string
 			
 			attach_function :row_count, :PQntuples, [:pointer], :int
-			
 			attach_function :field_count, :PQnfields, [:pointer], :int
-			
 			attach_function :field_name, :PQfname, [:pointer, :int], :string
-			
+			attach_function :field_type, :PQftype, [:pointer, :int], :int
 			attach_function :get_value, :PQgetvalue, [:pointer, :int, :int], :string
 			
 			attach_function :clear, :PQclear, [:pointer], :void
 			
+			attach_function :put_copy_end, :PQputCopyEnd, [:pointer, :string], :int
+			attach_function :get_copy_data, :PQgetCopyData, [:pointer, :pointer, :int], :int
+			attach_function :free_memory, :PQfreemem, [:pointer], :void
+			
 			class Result < FFI::Pointer
+				def initialize(connection, types = {}, address)
+					super(address)
+					
+					@connection = connection
+					@fields = nil
+					@types = types
+					@casts = nil
+				end
+				
 				def field_count
 					Native.field_count(self)
+				end
+				
+				def field_types
+					field_count.times.collect{|i| @types[Native.field_type(self, i)]}
 				end
 				
 				def field_names
@@ -63,9 +77,21 @@ module DB
 					Native.row_count(self)
 				end
 				
+				def cast!(row)
+					@casts ||= self.field_types
+					
+					row.size.times do |index|
+						if cast = @casts[index]
+							row[index] = cast.parse(row[index])
+						end
+					end
+					
+					return row
+				end
+				
 				def each
 					row_count.times do |i|
-						yield get_row(i)
+						yield cast!(get_row(i))
 					end
 					
 					Native.clear(self)

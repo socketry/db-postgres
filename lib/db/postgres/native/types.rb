@@ -18,35 +18,53 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require_relative 'types'
+require 'ffi'
 
 require 'json'
-require 'time'
+require 'bigdecimal'
 
 module DB
 	module Postgres
 		module Native
-			# These are hard coded OIDs.
-			DEFAULT_TYPES = {
-				16 => Types::Boolean,
+			module Types
+				module Boolean
+					def self.parse(string)
+						string == 't'
+					end
+				end
 				
-				20 => Types::Integer,
-				21 => Types::Integer,
-				23 => Types::Integer,
+				module Integer
+					def self.parse(string)
+						Integer(string)
+					end
+				end
 				
-				114 => JSON,
+				module Decimal
+					def self.parse(string)
+						BigDecimal(string)
+					end
+				end
 				
-				700 => Types::Float,
-				701 => Types::Float,
+				module Float
+					def self.parse(string)
+						Float(string)
+					end
+				end
 				
-				1082 => Date,
-				1083 => Types::DateTime,
-				1114 => Types::DateTime,
+				module Symbol
+					def self.parse(string)
+						string.to_sym
+					end
+				end
 				
-				1700 => Types::Decimal,
-				
-				3500 => Types::Symbol,
-			}
+				module DateTime
+					def self.parse(string)
+						parts = string.split(/[\-\s:\.]/)
+						
+						return Time.utc(*parts)
+					end
+				end
+			end
 		end
 	end
 end
