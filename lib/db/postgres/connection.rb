@@ -21,9 +21,9 @@
 # THE SOFTWARE.
 
 require 'async/pool/resource'
-require_relative 'native/connection'
-
 require 'async/io/generic'
+
+require_relative 'native/connection'
 
 module DB
 	module Postgres
