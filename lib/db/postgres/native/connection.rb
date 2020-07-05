@@ -20,6 +20,7 @@
 
 require_relative 'result'
 require_relative 'field'
+require_relative '../error'
 
 module DB
 	module Postgres
@@ -196,6 +197,16 @@ module DB
 				
 				def next_result(types: @types)
 					if result = self.get_result
+						status = Native.result_status(result)
+						
+						if status == :fatal_error
+							message = Native.result_error_message(result)
+							
+							Native.clear(result)
+							
+							raise Error, "Could not get next result: #{message}"
+						end
+						
 						return Result.new(self, types, result)
 					end
 				end
@@ -208,7 +219,7 @@ module DB
 						
 						case status
 						when :copy_in
-							self.put_copy_end("discard results")
+							self.put_copy_end("Discard results")
 						when :copy_out
 							self.flush_copy_out
 						end
@@ -244,7 +255,7 @@ module DB
 						
 						if status == -1
 							message = Native.error_message(self)
-							raise Error.new(message)
+							raise Error, message
 						elsif status == 0
 							@io.wait_writable
 						else
@@ -261,7 +272,7 @@ module DB
 						
 						if status == -2
 							message = Native.error_message(self)
-							raise Error.new(message)
+							raise Error, message
 						elsif status == -1
 							break
 						elsif status == 0
@@ -289,7 +300,7 @@ module DB
 				def check!(result)
 					if result == 0
 						message = Native.error_message(self)
-						raise Error.new(message)
+						raise Error, message
 					end
 				end
 			end

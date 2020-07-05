@@ -76,30 +76,32 @@ module DB
 				return buffer
 			end
 			
+			def id_column(name = 'id', primary_key: true)
+				buffer = String.new
+				
+				append_identifier(name, buffer)
+				
+				buffer << " BIGSERIAL"
+				
+				if primary_key
+					buffer << " PRIMARY KEY"
+				end
+				
+				return buffer
+			end
+			
 			def status
 				@native.status
 			end
 			
 			def send_query(statement)
+				@native.discard_results
+				
 				@native.send_query(statement)
 			end
 			
 			def next_result
 				@native.next_result
-			end
-			
-			def call(statement, streaming: false)
-				@native.send_query(statement)
-				
-				@native.single_row_mode! if streaming
-				
-				last_result = nil
-				
-				while result = @native.next_result
-					last_result = result
-				end
-				
-				return last_result
 			end
 		end
 	end
