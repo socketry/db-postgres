@@ -103,7 +103,7 @@ module DB
 			end
 			
 			class Connection < FFI::Pointer
-				def self.connect(io: IO, types: DEFAULT_TYPES, **options)
+				def self.connect(wrapper: IO, types: DEFAULT_TYPES, **options)
 					# Prefer 'database' key for 'dbname' parameter:
 					if database = options.delete(:database)
 						options[:dbname] = database
@@ -114,7 +114,7 @@ module DB
 					
 					pointer = Native.connect_start_params(keys, values, 0)
 					
-					io = io.new(Native.socket(pointer), "r+")
+					io = wrapper.new(Native.socket(pointer), "r+")
 					
 					while status = Native.connect_poll(pointer)
 						break if status == :ok || status == :failed
