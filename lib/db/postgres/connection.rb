@@ -27,12 +27,6 @@ require_relative 'native/connection'
 
 module DB
 	module Postgres
-		module IO
-			def self.new(fd, mode)
-				Async::IO::Generic.new(::IO.new(fd, mode, autoclose: false))
-			end
-		end
-		
 		# This implements the interface between the underlying 
 		class Connection < Async::Pool::Resource
 			def initialize(**options)

@@ -96,6 +96,12 @@ module DB
 			attach_function :escape_literal, :PQescapeLiteral, [:pointer, :string, :size_t], :pointer
 			attach_function :escape_identifier, :PQescapeIdentifier, [:pointer, :string, :size_t], :pointer
 			
+			module IO
+				def self.new(fd, mode)
+					Async::IO::Generic.new(::IO.new(fd, mode, autoclose: false))
+				end
+			end
+			
 			class Connection < FFI::Pointer
 				def self.connect(io: IO, types: DEFAULT_TYPES, **options)
 					# Prefer 'database' key for 'dbname' parameter:
