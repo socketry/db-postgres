@@ -50,10 +50,6 @@ jobs:
         sudo -u postgres createuser -s -d $(id -un)
         sudo -u postgres createdb test
     
-    - name: Preparing environment (macos)
-      if: matrix.os == 'macos'
-      run: brew install mariadb
-    
     - name: Run tests
       timeout-minutes: 5
       run: |
