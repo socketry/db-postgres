@@ -130,7 +130,7 @@ module DB
 						
 						Native.finish(pointer)
 						
-						raise "connect: #{error_message}"
+						raise Error, "Could not connect: #{error_message}"
 					end
 					
 					Native.set_nonblocking(pointer, 1)
