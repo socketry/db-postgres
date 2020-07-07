@@ -43,7 +43,9 @@ module DB
 			attach_function :field_count, :PQnfields, [:pointer], :int
 			attach_function :field_name, :PQfname, [:pointer, :int], :string
 			attach_function :field_type, :PQftype, [:pointer, :int], :int
+			
 			attach_function :get_value, :PQgetvalue, [:pointer, :int, :int], :string
+			attach_function :get_is_null, :PQgetisnull, [:pointer, :int, :int], :int
 			
 			attach_function :clear, :PQclear, [:pointer], :void
 			
@@ -109,7 +111,9 @@ module DB
 				
 			protected
 				def get_value(row, field)
-					Native.get_value(self, row, field)
+					if Native.get_is_null(self, row, field) == 0
+						Native.get_value(self, row, field)
+					end
 				end
 				
 				def get_row(row)
