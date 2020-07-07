@@ -113,6 +113,7 @@ module DB
 					values = Native.array_of_strings(options.values)
 					
 					pointer = Native.connect_start_params(keys, values, 0)
+					Native.set_nonblocking(pointer, 1)
 					
 					io = wrapper.new(Native.socket(pointer), "r+")
 					
@@ -132,8 +133,6 @@ module DB
 						
 						raise Error, "Could not connect: #{error_message}"
 					end
-					
-					Native.set_nonblocking(pointer, 1)
 					
 					return self.new(pointer, io, types)
 				end
