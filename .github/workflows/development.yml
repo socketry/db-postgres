@@ -45,7 +45,7 @@ jobs:
       if: matrix.os == 'ubuntu'
       run: |
         sudo apt-get install postgresql postgresql-contrib
-        echo "local all all trust" | sudo tee -a /var/lib/postgresql/12/main/pg_hba.conf
+        echo "local all all trust" | sudo tee -a /var/lib/postgresql/13/main/pg_hba.conf
         sudo systemctl restart postgresql
         sudo -u postgres createuser -s -d $(id -un)
         sudo -u postgres createdb test
