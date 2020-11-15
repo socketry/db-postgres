@@ -25,16 +25,16 @@ require_relative '../error'
 module DB
 	module Postgres
 		module Native
-			def self.array_of_strings(values)
-				array = FFI::MemoryPointer.new(:pointer, values.size + 1)
-				
-				pointers = values.map do |value|
-					FFI::MemoryPointer.from_string(value.to_s)
+			class Strings
+				def initialize(values)
+					@array = FFI::MemoryPointer.new(:pointer, values.size + 1)
+					@pointers = values.map do |value|
+						FFI::MemoryPointer.from_string(value.to_s)
+					end
+					@array.write_array_of_pointer(@pointers)
 				end
 				
-				array.write_array_of_pointer(pointers)
-				
-				return array
+				attr :array
 			end
 			
 			attach_function :connect_start_params, :PQconnectStartParams, [:pointer, :pointer, :int], :pointer
@@ -109,10 +109,10 @@ module DB
 						options[:dbname] = database
 					end
 					
-					keys = Native.array_of_strings(options.keys)
-					values = Native.array_of_strings(options.values)
+					keys = Strings.new(options.keys)
+					values = Strings.new(options.values)
 					
-					pointer = Native.connect_start_params(keys, values, 0)
+					pointer = Native.connect_start_params(keys.array, values.array, 0)
 					Native.set_nonblocking(pointer, 1)
 					
 					io = wrapper.new(Native.socket(pointer), "r+")
