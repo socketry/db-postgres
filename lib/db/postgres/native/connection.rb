@@ -104,9 +104,14 @@ module DB
 			
 			class Connection < FFI::Pointer
 				def self.connect(wrapper: IO, types: DEFAULT_TYPES, **options)
-					# Prefer 'database' key for 'dbname' parameter:
+					# Postgres expects "dbname" as the key name:
 					if database = options.delete(:database)
 						options[:dbname] = database
+					end
+					
+					# Postgres expects "user" as the key name:
+					if username = options.delete(:username)
+						options[:user] = username
 					end
 					
 					keys = Strings.new(options.keys)
