@@ -32,6 +32,22 @@ jobs:
             ruby: head
             experimental: true
     
+    services:
+      postgres:
+        image: postgres
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 20
+    
     steps:
     - uses: actions/checkout@v2
     - uses: ruby/setup-ruby@v1
@@ -41,14 +57,10 @@ jobs:
     - name: Install dependencies
       run: ${{matrix.env}} bundle install
     
-    - name: Preparing environment (ubuntu)
+    - name: Installing dependencies (ubuntu)
       if: matrix.os == 'ubuntu'
       run: |
         sudo apt-get install postgresql postgresql-contrib
-        echo "local all all trust" | sudo tee -a /var/lib/postgresql/13/main/pg_hba.conf
-        sudo systemctl restart postgresql
-        sudo -u postgres createuser -s -d $(id -un)
-        sudo -u postgres createdb test
     
     - name: Run tests
       timeout-minutes: 5

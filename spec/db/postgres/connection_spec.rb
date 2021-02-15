@@ -26,7 +26,7 @@ require 'async/rspec'
 RSpec.describe DB::Postgres::Connection do
 	include_context Async::RSpec::Reactor
 	
-	subject(:connection) {DB::Postgres::Connection.new(database: 'test')}
+	subject(:connection) {DB::Postgres::Connection.new(**CREDENTIALS)}
 	
 	it "should connect to local postgres" do
 		expect(connection.status).to be == :ok
@@ -54,7 +54,6 @@ RSpec.describe DB::Postgres::Connection do
 	ensure
 		connection.close
 	end
-	
 	
 	describe '#append_string' do
 		it "should escape string" do
