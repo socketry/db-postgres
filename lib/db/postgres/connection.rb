@@ -81,15 +81,17 @@ module DB
 				return buffer
 			end
 			
-			def id_column(name = 'id', primary_key: true)
+			def key_column(name = 'id', primary: true, null: false)
 				buffer = String.new
 				
 				append_identifier(name, buffer)
 				
 				buffer << " BIGSERIAL"
 				
-				if primary_key
+				if primary
 					buffer << " PRIMARY KEY"
+				elsif !null
+					buffer << " NOT NULL"
 				end
 				
 				return buffer
