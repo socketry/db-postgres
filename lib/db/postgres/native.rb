@@ -18,14 +18,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'ffi'
+require 'ffi/module'
+require 'ffi/module/config_tool'
 
 module DB
 	module Postgres
 		module Native
-			extend FFI::Library
+			extend FFI::Module::Library
+			extend FFI::Module::Loader
+			extend FFI::Module::ConfigTool
 			
-			ffi_lib 'pq'
+			ffi_load('pq') || ffi_load_using_config_tool(%w{pg_config --libdir}, names: ['pq'])
 		end
 	end
 end

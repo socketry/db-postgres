@@ -23,7 +23,7 @@ require_relative '../native'
 module DB
 	module Postgres
 		module Native
-			enum :query_status, [
+			ffi_define_enumeration :query_status, [
 				:empty_query, # empty query string was executed
 				:command_ok, # a query command that doesn't return anything was executed properly by the backend
 				:tuples_ok, #  a query command that returns tuples was executed properly by the backend, PGresult contains the result tuples
@@ -36,22 +36,22 @@ module DB
 				:single_tuple, # single tuple from larger resultset
 			]
 			
-			attach_function :result_status, :PQresultStatus, [:pointer], :query_status
-			attach_function :result_error_message, :PQresultErrorMessage, [:pointer], :string
+			ffi_attach_function :result_status, :PQresultStatus, [:pointer], :query_status
+			ffi_attach_function :result_error_message, :PQresultErrorMessage, [:pointer], :string
 			
-			attach_function :row_count, :PQntuples, [:pointer], :int
-			attach_function :field_count, :PQnfields, [:pointer], :int
-			attach_function :field_name, :PQfname, [:pointer, :int], :string
-			attach_function :field_type, :PQftype, [:pointer, :int], :int
+			ffi_attach_function :row_count, :PQntuples, [:pointer], :int
+			ffi_attach_function :field_count, :PQnfields, [:pointer], :int
+			ffi_attach_function :field_name, :PQfname, [:pointer, :int], :string
+			ffi_attach_function :field_type, :PQftype, [:pointer, :int], :int
 			
-			attach_function :get_value, :PQgetvalue, [:pointer, :int, :int], :string
-			attach_function :get_is_null, :PQgetisnull, [:pointer, :int, :int], :int
+			ffi_attach_function :get_value, :PQgetvalue, [:pointer, :int, :int], :string
+			ffi_attach_function :get_is_null, :PQgetisnull, [:pointer, :int, :int], :int
 			
-			attach_function :clear, :PQclear, [:pointer], :void
+			ffi_attach_function :clear, :PQclear, [:pointer], :void
 			
-			attach_function :put_copy_end, :PQputCopyEnd, [:pointer, :string], :int
-			attach_function :get_copy_data, :PQgetCopyData, [:pointer, :pointer, :int], :int
-			attach_function :free_memory, :PQfreemem, [:pointer], :void
+			ffi_attach_function :put_copy_end, :PQputCopyEnd, [:pointer, :string], :int
+			ffi_attach_function :get_copy_data, :PQgetCopyData, [:pointer, :pointer, :int], :int
+			ffi_attach_function :free_memory, :PQfreemem, [:pointer], :void
 			
 			class Result < FFI::Pointer
 				include Enumerable
@@ -102,6 +102,7 @@ module DB
 				end
 				
 			protected
+				
 				def get_value(row, field)
 					if Native.get_is_null(self, row, field) == 0
 						Native.get_value(self, row, field)
