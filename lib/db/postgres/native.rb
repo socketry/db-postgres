@@ -28,7 +28,28 @@ module DB
 			extend FFI::Module::Loader
 			extend FFI::Module::ConfigTool
 			
-			ffi_load('pq') || ffi_load_using_config_tool(%w{pg_config --libdir}, names: ['pq'])
+			ffi_load('pq') ||
+				ffi_load_using_config_tool(%w{pg_config --libdir}, names: ['pq']) ||
+				ffi_load_failure(<<~EOF)
+					Unable to load libpq!
+					
+					## Ubuntu
+					
+						sudo apt-get install postgresql postgresql-contrib
+					
+					## Arch Linux
+					
+						sudo pacman -S postgresql
+					
+					## MacPorts
+					
+						sudo port install postgresql11
+					
+					## Homebrew
+					
+						brew install postgresql
+					
+				EOF
 		end
 	end
 end
