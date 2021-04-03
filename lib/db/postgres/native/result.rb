@@ -36,22 +36,22 @@ module DB
 				:single_tuple, # single tuple from larger resultset
 			]
 			
-			ffi_attach_function :result_status, :PQresultStatus, [:pointer], :query_status
-			ffi_attach_function :result_error_message, :PQresultErrorMessage, [:pointer], :string
+			ffi_attach_function :PQresultStatus, [:pointer], :query_status, as: :result_status
+			ffi_attach_function :PQresultErrorMessage, [:pointer], :string, as: :result_error_message
 			
-			ffi_attach_function :row_count, :PQntuples, [:pointer], :int
-			ffi_attach_function :field_count, :PQnfields, [:pointer], :int
-			ffi_attach_function :field_name, :PQfname, [:pointer, :int], :string
-			ffi_attach_function :field_type, :PQftype, [:pointer, :int], :int
+			ffi_attach_function :PQntuples, [:pointer], :int, as: :row_count
+			ffi_attach_function :PQnfields, [:pointer], :int, as: :field_count
+			ffi_attach_function :PQfname, [:pointer, :int], :string, as: :field_name
+			ffi_attach_function :PQftype, [:pointer, :int], :int, as: :field_type
 			
-			ffi_attach_function :get_value, :PQgetvalue, [:pointer, :int, :int], :string
-			ffi_attach_function :get_is_null, :PQgetisnull, [:pointer, :int, :int], :int
+			ffi_attach_function :PQgetvalue, [:pointer, :int, :int], :string, as: :get_value
+			ffi_attach_function :PQgetisnull, [:pointer, :int, :int], :int, as: :get_is_null
 			
-			ffi_attach_function :clear, :PQclear, [:pointer], :void
+			ffi_attach_function :PQclear, [:pointer], :void, as: :clear
 			
-			ffi_attach_function :put_copy_end, :PQputCopyEnd, [:pointer, :string], :int
-			ffi_attach_function :get_copy_data, :PQgetCopyData, [:pointer, :pointer, :int], :int
-			ffi_attach_function :free_memory, :PQfreemem, [:pointer], :void
+			ffi_attach_function :PQputCopyEnd, [:pointer, :string], :int, as: :put_copy_end
+			ffi_attach_function :PQgetCopyData, [:pointer, :pointer, :int], :int, as: :get_copy_data
+			ffi_attach_function :PQfreemem, [:pointer], :void, as: :free_memory
 			
 			class Result < FFI::Pointer
 				include Enumerable

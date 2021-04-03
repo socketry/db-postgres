@@ -37,7 +37,7 @@ module DB
 				attr :array
 			end
 			
-			ffi_attach_function :connect_start_params, :PQconnectStartParams, [:pointer, :pointer, :int], :pointer
+			ffi_attach_function :PQconnectStartParams, [:pointer, :pointer, :int], :pointer, as: :connect_start_params
 			
 			ffi_define_enumeration :polling_status, [
 				:failed,
@@ -46,12 +46,12 @@ module DB
 				:ok,
 			]
 			
-			ffi_attach_function :connect_poll, :PQconnectPoll, [:pointer], :polling_status
+			ffi_attach_function :PQconnectPoll, [:pointer], :polling_status, as: :connect_poll
 			
 			# Close the connection and release underlying resources.
-			ffi_attach_function :finish, :PQfinish, [:pointer], :void
+			ffi_attach_function :PQfinish, [:pointer], :void, as: :finish
 			
-			ffi_attach_function :error_message, :PQerrorMessage, [:pointer], :string
+			ffi_attach_function :PQerrorMessage, [:pointer], :string, as: :error_message
 			
 			ffi_define_enumeration :status, [
 				# Normal mode:
@@ -70,31 +70,31 @@ module DB
 				:consume, # Wait for any pending message and consume them.
 			]
 			
-			ffi_attach_function :status, :PQstatus, [:pointer], :status
+			ffi_attach_function :PQstatus, [:pointer], :status, as: :status
 			
-			ffi_attach_function :socket, :PQsocket, [:pointer], :int
+			ffi_attach_function :PQsocket, [:pointer], :int, as: :socket
 			
-			ffi_attach_function :set_nonblocking, :PQsetnonblocking, [:pointer, :int], :int
-			ffi_attach_function :flush, :PQflush, [:pointer], :int
+			ffi_attach_function :PQsetnonblocking, [:pointer, :int], :int, as: :set_nonblocking
+			ffi_attach_function :PQflush, [:pointer], :int, as: :flush
 			
 			# Submits a command to the server without waiting for the result(s). 1 is returned if the command was successfully dispatched and 0 if not (in which case, use PQerrorMessage to get more information about the failure).
-			ffi_attach_function :send_query, :PQsendQuery, [:pointer, :string], :int
+			ffi_attach_function :PQsendQuery, [:pointer, :string], :int, as: :send_query
 			
 			# int PQsendQueryParams(PGconn *conn, const char *command, int nParams, const Oid *paramTypes, const char * const *paramValues, const int *paramLengths, const int *paramFormats, int resultFormat);
-			ffi_attach_function :send_query_params, :PQsendQueryParams, [:pointer, :string, :int, :pointer, :pointer, :pointer, :pointer, :int], :int
+			ffi_attach_function :PQsendQueryParams, [:pointer, :string, :int, :pointer, :pointer, :pointer, :pointer, :int], :int, as: :send_query_params
 			
-			ffi_attach_function :set_single_row_mode, :PQsetSingleRowMode, [:pointer], :int
+			ffi_attach_function :PQsetSingleRowMode, [:pointer], :int, as: :set_single_row_mode
 			
-			ffi_attach_function :get_result, :PQgetResult, [:pointer], :pointer
+			ffi_attach_function :PQgetResult, [:pointer], :pointer, as: :get_result
 			
 			# If input is available from the server, consume it:
-			ffi_attach_function :consume_input, :PQconsumeInput, [:pointer], :int
+			ffi_attach_function :PQconsumeInput, [:pointer], :int, as: :consume_input
 			
 			# Returns 1 if a command is busy, that is, PQgetResult would block waiting for input. A 0 return indicates that PQgetResult can be called with assurance of not blocking.
-			ffi_attach_function :is_busy, :PQisBusy, [:pointer], :int
+			ffi_attach_function :PQisBusy, [:pointer], :int, as: :is_busy
 			
-			ffi_attach_function :escape_literal, :PQescapeLiteral, [:pointer, :string, :size_t], :pointer
-			ffi_attach_function :escape_identifier, :PQescapeIdentifier, [:pointer, :string, :size_t], :pointer
+			ffi_attach_function :PQescapeLiteral, [:pointer, :string, :size_t], :pointer, as: :escape_literal
+			ffi_attach_function :PQescapeIdentifier, [:pointer, :string, :size_t], :pointer, as: :escape_identifier
 			
 			module IO
 				def self.new(fd, mode)
