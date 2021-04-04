@@ -103,13 +103,20 @@ module DB
 					results = []
 					
 					self.each do |row|
-						results << yield row
+						results << yield(row)
 					end
 					
 					return results
 				end
 				
 				def to_a
+					rows = []
+					
+					self.each do |row|
+						rows << row
+					end
+					
+					return rows
 				end
 				
 			protected
