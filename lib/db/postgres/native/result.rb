@@ -54,8 +54,6 @@ module DB
 			ffi_attach_function :PQfreemem, [:pointer], :void, as: :free_memory
 			
 			class Result < FFI::Pointer
-				include Enumerable
-				
 				def initialize(connection, types = {}, address)
 					super(address)
 					
@@ -99,6 +97,19 @@ module DB
 					end
 					
 					Native.clear(self)
+				end
+				
+				def map(&block)
+					results = []
+					
+					self.each do |row|
+						results << yield row
+					end
+					
+					return results
+				end
+				
+				def to_a
 				end
 				
 			protected
