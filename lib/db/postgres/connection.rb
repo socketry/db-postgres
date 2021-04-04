@@ -86,7 +86,11 @@ module DB
 				
 				append_identifier(name, buffer)
 				
-				buffer << " BIGSERIAL"
+				if primary
+					buffer << " BIGSERIAL"
+				else
+					buffer << " BIGINT"
+				end
 				
 				if primary
 					buffer << " PRIMARY KEY"
