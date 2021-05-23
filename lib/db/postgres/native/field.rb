@@ -20,9 +20,6 @@
 
 require_relative 'types'
 
-require 'json'
-require 'time'
-
 module DB
 	module Postgres
 		module Native
@@ -34,7 +31,7 @@ module DB
 				21 => Types::Integer,
 				23 => Types::Integer,
 				
-				114 => JSON,
+				114 => Types::JSON,
 				
 				700 => Types::Float,
 				701 => Types::Float,

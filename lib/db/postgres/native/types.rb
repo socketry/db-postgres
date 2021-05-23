@@ -22,6 +22,7 @@ require 'ffi'
 
 require 'json'
 require 'bigdecimal'
+require 'time'
 
 module DB
 	module Postgres
@@ -35,33 +36,41 @@ module DB
 				
 				module Integer
 					def self.parse(string)
-						Integer(string)
+						Integer(string) if string
 					end
 				end
 				
 				module Decimal
 					def self.parse(string)
-						BigDecimal(string)
+						BigDecimal(string) if string
 					end
 				end
 				
 				module Float
 					def self.parse(string)
-						Float(string)
+						Float(string) if string
 					end
 				end
 				
 				module Symbol
 					def self.parse(string)
-						string.to_sym
+						string&.to_sym
 					end
 				end
 				
 				module DateTime
 					def self.parse(string)
-						parts = string.split(/[\-\s:\.]/)
-						
-						return Time.utc(*parts)
+						if string
+							parts = string.split(/[\-\s:\.]/)
+							
+							return Time.utc(*parts)
+						end
+					end
+				end
+				
+				module JSON
+					def self.parse(string)
+						::JSON.parse(string, symbolize_names: true) if string
 					end
 				end
 			end
