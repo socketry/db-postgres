@@ -214,7 +214,7 @@ module DB
 							
 							Native.clear(result)
 							
-							raise Error, "Could not get next result: #{message}"
+							raise Error, message
 						end
 						
 						return Result.new(self, types, result)
