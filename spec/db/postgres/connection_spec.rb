@@ -44,6 +44,18 @@ RSpec.describe DB::Postgres::Connection do
 		connection.close
 	end
 	
+	it "should execute multiple queries" do
+		connection.send_query("SELECT 42 AS LIFE; SELECT 24 AS LIFE")
+		
+		result = connection.next_result
+		expect(result.to_a).to be == [[42]]
+		
+		result = connection.next_result
+		expect(result.to_a).to be == [[24]]
+	ensure
+		connection.close
+	end
+	
 	it "can get current time" do
 		connection.send_query("SELECT (NOW() AT TIME ZONE 'UTC') AS NOW")
 		
