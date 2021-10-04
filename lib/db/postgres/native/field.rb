@@ -30,7 +30,7 @@ module DB
 				text: Types::Text.new("TEXT"),
 				string: Types::Text.new("VARCHAR(255)"),
 				
-				# Native types:
+				# Symbolic types:
 				decimal: Types::Decimal.new,
 				boolean: Types::Boolean.new,
 				
@@ -49,6 +49,7 @@ module DB
 				json: Types::JSON.new,
 				enum: Types::Symbol.new,
 				
+				# Native types:
 				# This data is extracted by hand from:
 				# <https://github.com/postgres/postgres/blob/master/src/include/catalog/pg_type.dat>.
 				# These are hard coded OIDs.
