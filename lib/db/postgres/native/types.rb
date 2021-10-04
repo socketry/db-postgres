@@ -99,10 +99,11 @@ module DB
 					attr :name
 					
 					def parse(string)
-						if string
-							parts = string.split(/[\-\s:]/)
+						if match = string.match(/(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+)([\+\-].*)?/)
+							parts = match.captures
+							parts[6] ||= "UTC"
 							
-							return Time.utc(*parts)
+							return Time.new(*parts)
 						end
 					end
 				end

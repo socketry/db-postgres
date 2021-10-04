@@ -41,9 +41,9 @@ module DB
 				float: Types::Float.new,
 				double: Types::Float.new("DOUBLE"),
 				
-				timestamp: Types::DateTime.new("TIMESTAMP"),
+				timestamp: Types::DateTime.new("TIMESTAMPTZ"),
 				date: Types::Date.new,
-				datetime: Types::DateTime.new("DATETIME"),
+				datetime: Types::DateTime.new("TIMESTAMPTZ"),
 				year: Types::Integer.new("LONG"),
 				
 				json: Types::JSON.new,
