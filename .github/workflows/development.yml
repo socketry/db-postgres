@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 jobs:
   test:
+    name: ${{matrix.ruby}} on ${{matrix.os}}
     runs-on: ${{matrix.os}}-latest
     continue-on-error: ${{matrix.experimental}}
     
@@ -13,9 +14,9 @@ jobs:
           - ubuntu
         
         ruby:
-          - 2.5
-          - 2.6
-          - 2.7
+          - "2.6"
+          - "2.7"
+          - "3.0"
         
         experimental: [false]
         env: [""]
@@ -56,6 +57,7 @@ jobs:
     
     - name: Install dependencies
       run: ${{matrix.env}} bundle install
+      bundler-cache: true
     
     - name: Installing dependencies (ubuntu)
       if: matrix.os == 'ubuntu'
@@ -64,5 +66,4 @@ jobs:
     
     - name: Run tests
       timeout-minutes: 5
-      run: |
-        ${{matrix.env}} bundle exec rspec
+      run: ${{matrix.env}} bundle exec rspec
