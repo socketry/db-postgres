@@ -96,5 +96,20 @@ RSpec.describe DB::Postgres::Connection do
 		ensure
 			connection.close
 		end
+		
+		it "can handle booleans" do
+			buffer = String.new
+			buffer << "SELECT "
+			connection.append_literal(true, buffer)
+			
+			connection.send_query(buffer)
+			
+			result = connection.next_result
+			row = result.to_a.first
+			
+			expect(row.first).to be true
+		ensure
+			connection.close
+		end
 	end
 end

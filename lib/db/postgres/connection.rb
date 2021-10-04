@@ -36,9 +36,16 @@ module DB
 			end
 			
 			def close
-				@native.close
+				if @native
+					@native&.close
+					@native = nil
+				end
 				
 				super
+			end
+			
+			def types
+				@native.types
 			end
 			
 			def append_string(value, buffer = String.new)
@@ -49,6 +56,8 @@ module DB
 			
 			def append_literal(value, buffer = String.new)
 				case value
+				when Time, DateTime, Date
+					append_string(value.iso8601, buffer)
 				when Numeric
 					buffer << value.to_s
 				when TrueClass

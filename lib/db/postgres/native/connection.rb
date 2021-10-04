@@ -149,6 +149,8 @@ module DB
 					@types = types
 				end
 				
+				attr :types
+				
 				# Return the status of the connection.
 				def status
 					Native.status(self)

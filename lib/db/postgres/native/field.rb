@@ -23,26 +23,56 @@ require_relative 'types'
 module DB
 	module Postgres
 		module Native
-			# These are hard coded OIDs.
 			DEFAULT_TYPES = {
-				16 => Types::Boolean,
+				# Pseudo types:
+				primary_key: Types::Integer.new('BIGSERIAL PRIMARY KEY'),
+				foreign_key: Types::Integer.new('BIGINT'),
+				text: Types::Text.new("TEXT"),
+				string: Types::Text.new("VARCHAR(255)"),
 				
-				20 => Types::Integer,
-				21 => Types::Integer,
-				23 => Types::Integer,
+				# Native types:
+				decimal: Types::Decimal.new,
+				boolean: Types::Boolean.new,
 				
-				114 => Types::JSON,
+				smallint: Types::Integer.new("SMALLINT"),
+				integer: Types::Integer.new("INTEGER"),
+				bigint: Types::Integer.new("BIGINT"),
 				
-				700 => Types::Float,
-				701 => Types::Float,
+				float: Types::Float.new,
+				double: Types::Float.new("DOUBLE"),
 				
-				1082 => Date,
-				1083 => Types::DateTime,
-				1114 => Types::DateTime,
+				timestamp: Types::DateTime.new("TIMESTAMP"),
+				date: Types::Date.new,
+				datetime: Types::DateTime.new("DATETIME"),
+				year: Types::Integer.new("LONG"),
 				
-				1700 => Types::Decimal,
+				json: Types::JSON.new,
+				enum: Types::Symbol.new,
 				
-				3500 => Types::Symbol,
+				# This data is extracted by hand from:
+				# <https://github.com/postgres/postgres/blob/master/src/include/catalog/pg_type.dat>.
+				# These are hard coded OIDs.
+				16 => Types::Boolean.new,
+				
+				20 => Types::Integer.new("int8"),
+				21 => Types::Integer.new("int2"),
+				23 => Types::Integer.new("int4"),
+				
+				114 => Types::JSON.new,
+				
+				700 => Types::Float.new('float4'),
+				701 => Types::Float.new('float8'),
+				
+				1082 => Types::Date.new,
+				1083 => Types::DateTime.new("TIME"),
+				
+				1114 => Types::DateTime.new("TIMESTAMP"),
+				1184 => Types::DateTime.new("TIMESTAMPTZ"),
+				
+				1700 => Types::Decimal.new,
+				
+				# Not sure if this is ever used?
+				3500 => Types::Symbol.new,
 			}
 		end
 	end
