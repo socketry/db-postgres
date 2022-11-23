@@ -18,10 +18,22 @@ Or install it yourself as:
 
     $ gem install db-postgres
 
-## Usage
 
+## Contents
 
-### A simple CREATE, INSERT and SELECT, with raw SQL
+* [1. Usage](#1-usage)
+  * [1.1. A simple CREATE, INSERT and SELECT, with raw SQL](#11-a-simple-create-insert-and-select-with-raw-sql)
+  * [1.2. Parameterized CREATE, INSERT and SELECT](#12-parameterized-create-insert-and-select)
+  * [1.3. A parameterized SELECT](#13-a-parameterized-select)
+  * [1.4. Concurrent queries](#14-concurrent-queries)
+  * [1.5. Limited to 3 connections](#15-limited-to-3-connections)
+  * [1.6. Sequential vs concurrent inserts](#16-sequential-vs-concurrent-inserts)
+* [2. Contributing](#2-contributing)
+* [3. License](#3-license)
+
+## 1. Usage
+
+### 1.1. A simple CREATE, INSERT and SELECT, with raw SQL
 
 ```ruby
 require 'async'
@@ -63,9 +75,9 @@ end
 =end
 ```
 
-### Parameterized CREATE, INSERT and SELECT
+### 1.2. Parameterized CREATE, INSERT and SELECT
 The same process as before, but parameterized.
-Always used the parameterized form when dealing with untrusted data.
+Always use the parameterized form when dealing with untrusted data.
 
 ```ruby
 # ...
@@ -110,7 +122,7 @@ end
 =end
 ```
 
-### A parameterized SELECT
+### 1.3. A parameterized SELECT
 
 ```ruby
 # ...
@@ -140,7 +152,7 @@ end
 =end
 ```
 
-### Concurrent queries
+### 1.4. Concurrent queries
 (Simulating slow queries with `PG_SLEEP`)
 
 ``` ruby
@@ -169,7 +181,7 @@ end
 
 ```
 
-### Limited to 3 connections
+### 1.5. Limited to 3 connections
 (Simulating slow queries with `PG_SLEEP`)
 
 ``` ruby
@@ -221,7 +233,7 @@ end
 =end
 ```
 
-### Sequential vs concurrent inserts
+### 1.6. Sequential vs concurrent inserts
 
 ``` ruby
 # ...
@@ -280,7 +292,7 @@ end
 =end
 ```
 
-## Contributing
+## 2. Contributing
 
 1.  Fork it
 2.  Create your feature branch (`git checkout -b my-new-feature`)
@@ -288,7 +300,7 @@ end
 4.  Push to the branch (`git push origin my-new-feature`)
 5.  Create new Pull Request
 
-## License
+## 3. License
 
 Copyright, 2018, by Samuel G. D. Williams. <http://www.codeotaku.com>
 
