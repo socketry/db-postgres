@@ -99,12 +99,16 @@ module DB
 					attr :name
 					
 					def parse(string)
-						if match = string.match(/(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+)([\+\-].*)?/)
-							parts = match.captures
-							parts[6] ||= "UTC"
-							
-							return Time.new(*parts)
+						return nil unless match = string.match(/\A(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+(?:\.\d+)?)([-+].*)?\z/)
+						parts = match.captures
+						parts[5] = BigDecimal(parts[5])
+						if parts[6].nil?
+							parts[6] = '+00:00'
+						elsif /^[-+]\d\d$/ === parts[6]
+							parts[6] += ':00'
 						end
+
+						Time.new(*parts)
 					end
 				end
 				

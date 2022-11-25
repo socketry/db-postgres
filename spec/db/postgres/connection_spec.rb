@@ -66,6 +66,51 @@ RSpec.describe DB::Postgres::Connection do
 	ensure
 		connection.close
 	end
+
+	it "can get timestamps with microseconds and tz" do
+		[{
+			# PG produces: "2022-11-11 12:38:59.123456+00"
+			zone: 'UTC',
+			time: '2022-11-11 23:38:59.123456+11',
+			result: Time.new(2022, 11, 11, 23, 38, BigDecimal('59.123456'), '+11:00'),
+		}, {
+			# PG produces: "2022-11-11 12:38:59+00"
+			zone: 'UTC',
+			time: '2022-11-11 23:38:59+11',
+			result: Time.new(2022, 11, 11, 23, 38, BigDecimal('59'),        '+11:00'),
+		}, {
+			# PG produces: "2022-11-11 23:38:59.123456+00"
+			zone: 'UTC',
+			time: '2022-11-11 23:38:59.123456',
+			result: Time.new(2022, 11, 11, 23, 38, BigDecimal('59.123456'), '+00:00'),
+		}, {
+			# PG produces: "2022-11-11 23:38:59+11"
+			zone: 'Australia/Sydney',
+			time: '2022-11-11 23:38:59',
+			result: Time.new(2022, 11, 11, 23, 38, BigDecimal('59'),        '+11:00'),
+		}, {
+			# PG produces: "2022-11-12 06:08:59.123456+11"
+			zone: 'Australia/Sydney',
+			time: '2022-11-11 23:38:59.123456+04:30',
+			result: Time.new(2022, 11, 11, 23, 38, BigDecimal('59.123456'), '+04:30'),
+		}, {
+			# PG produces: "2000-01-01 05:30:00+05:30"
+			zone: 'Asia/Kolkata',
+			time: '2000-01-01 00:00:00+00',
+			result: Time.new(2000, 1, 1, 5, 30, 0, '+05:30'),
+		}].each do |spec|
+
+			connection.send_query("SET TIME ZONE '#{spec[:zone]}'");
+			connection.send_query("SELECT '#{spec[:time]}'::TIMESTAMPTZ AS TS")
+
+			result = connection.next_result
+			row = result.to_a.first
+
+			expect(row.first).to be == spec[:result]
+		end
+	ensure
+		connection.close
+	end
 	
 	describe '#append_string' do
 		it "should escape string" do
