@@ -98,10 +98,31 @@ RSpec.describe DB::Postgres::Connection do
 			zone: 'Asia/Kolkata',
 			time: '2000-01-01 00:00:00+00',
 			result: Time.new(2000, 1, 1, 5, 30, 0, '+05:30'),
+		}, {
+			# PG produces: "infinity"
+			zone: 'UTC',
+			time: 'infinity',
+			result: 'infinity',
+		}, {
+			# PG produces: "-infinity"
+			zone: 'UTC',
+			time: '-infinity',
+			result: '-infinity',
+		}, {
+			# PG produces: null
+			zone: 'UTC',
+			time: nil,
+			result: nil,
 		}].each do |spec|
 
-			connection.send_query("SET TIME ZONE '#{spec[:zone]}'");
-			connection.send_query("SELECT '#{spec[:time]}'::TIMESTAMPTZ AS TS")
+			connection.send_query("SET TIME ZONE '#{spec[:zone]}'")
+
+			buffer = String.new
+			buffer << "SELECT "
+			connection.append_literal(spec[:time], buffer)
+			buffer << "::TIMESTAMPTZ"
+
+			connection.send_query buffer
 
 			result = connection.next_result
 			row = result.to_a.first

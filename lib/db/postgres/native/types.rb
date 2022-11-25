@@ -99,16 +99,21 @@ module DB
 					attr :name
 					
 					def parse(string)
-						return nil unless match = string.match(/\A(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+(?:\.\d+)?)([-+].*)?\z/)
-						parts = match.captures
-						parts[5] = BigDecimal(parts[5])
-						if parts[6].nil?
-							parts[6] = '+00:00'
-						elsif /^[-+]\d\d$/ === parts[6]
-							parts[6] += ':00'
+						case string
+						when '-infinity', 'infinity', nil
+							string
+						when /\A(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+(?:\.\d+)?)([-+]\d\d(?::\d\d)?)?\z/
+							parts = $~.captures
+							parts[5] = BigDecimal(parts[5])
+							if parts[6].nil?
+								parts[6] = '+00:00'
+							elsif /^[-+]\d\d$/ === parts[6]
+								parts[6] += ':00'
+							end
+							Time.new(*parts)
+						else
+							raise "Invalid TIMESTAMP: #{string}"
 						end
-
-						Time.new(*parts)
 					end
 				end
 				
