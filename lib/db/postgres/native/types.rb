@@ -84,9 +84,18 @@ module DB
 					attr :name
 					
 					def parse(string)
-						if match = string.match(/(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+)([\+\-].*)?/)
+						if string == '-infinity' || string == 'infinity' || string.nil?
+							return string
+						end
+						
+						if match = string.match(/\A(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+(?:\.\d+)?)([-+]\d\d(?::\d\d)?)?\z/)
 							parts = match.captures
-							parts[6] ||= "UTC"
+							
+							parts[5] = BigDecimal(parts[5])
+							
+							if parts[6].nil?
+								parts[6] = '+00'
+							end
 							
 							return Time.new(*parts)
 						end
