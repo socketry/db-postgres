@@ -1,12 +1,18 @@
-name: Development
+name: Test Coverage
 
 on: [push, pull_request]
+
+permissions:
+  contents: read
+
+env:
+  CONSOLE_OUTPUT: XTerm
+  COVERAGE: PartialSummary
 
 jobs:
   test:
     name: ${{matrix.ruby}} on ${{matrix.os}}
     runs-on: ${{matrix.os}}-latest
-    continue-on-error: ${{matrix.experimental}}
     
     strategy:
       matrix:
@@ -14,24 +20,7 @@ jobs:
           - ubuntu
         
         ruby:
-          - "2.6"
-          - "2.7"
-          - "3.0"
-        
-        experimental: [false]
-        env: [""]
-        
-        include:
-          - os: ubuntu
-            ruby: truffleruby
-            experimental: true
-          - os: ubuntu
-            ruby: jruby
-            experimental: true
-            env: JRUBY_OPTS="--debug -X+O"
-          - os: ubuntu
-            ruby: head
-            experimental: true
+          - "3.3"
     
     services:
       postgres:
@@ -50,7 +39,7 @@ jobs:
           --health-retries 20
     
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{matrix.ruby}}
@@ -63,4 +52,26 @@ jobs:
     
     - name: Run tests
       timeout-minutes: 5
-      run: ${{matrix.env}} bundle exec rspec
+      run: bundle exec bake test
+    
+    - uses: actions/upload-artifact@v3
+      with:
+        name: coverage-${{matrix.os}}-${{matrix.ruby}}
+        path: .covered.db
+  
+  validate:
+    needs: test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: "3.3"
+        bundler-cache: true
+    
+    - uses: actions/download-artifact@v3
+    
+    - name: Validate coverage
+      timeout-minutes: 5
+      run: bundle exec bake covered:validate --paths */.covered.db \;

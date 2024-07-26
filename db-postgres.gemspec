@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 require_relative "lib/db/postgres/version"
 
@@ -6,7 +7,7 @@ Gem::Specification.new do |spec|
 	spec.version = DB::Postgres::VERSION
 	
 	spec.summary = "Ruby FFI bindings for libpq C interface."
-	spec.authors = ["Samuel Williams"]
+	spec.authors = ["Samuel Williams", "Aidan Samuel", "Tony Schneider"]
 	spec.license = "MIT"
 	
 	spec.cert_chain  = ['release.cert']
@@ -14,17 +15,16 @@ Gem::Specification.new do |spec|
 	
 	spec.homepage = "https://github.com/socketry/db-postgres"
 	
-	spec.files = Dir.glob('{lib}/**/*', File::FNM_DOTMATCH, base: __dir__)
+	spec.metadata = {
+		"documentation_uri" => "https://socketry.github.io/db-postgres/",
+		"funding_uri" => "https://github.com/sponsors/ioquatix",
+		"source_code_uri" => "https://github.com/socketry/db-postgres.git",
+	}
 	
-	spec.required_ruby_version = ">= 2.5"
+	spec.files = Dir.glob(['{lib}/**/*', '*.md'], File::FNM_DOTMATCH, base: __dir__)
 	
-	spec.add_dependency "async-io"
+	spec.required_ruby_version = ">= 3.1"
+	
 	spec.add_dependency "async-pool"
-	spec.add_dependency "ffi-module", "~> 0.3.0"
-	
-	spec.add_development_dependency "async-rspec"
-	spec.add_development_dependency "bake"
-	spec.add_development_dependency "bundler"
-	spec.add_development_dependency "covered"
-	spec.add_development_dependency "rspec", "~> 3.6"
+	spec.add_dependency "ffi-native", "~> 0.4"
 end

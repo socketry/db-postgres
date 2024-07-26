@@ -1,8 +1,5 @@
 /.bundle/
-/doc/
 /pkg/
-/tmp/
-
-# rspec failure tracking
-.rspec_status
-gems.locked
+/gems.locked
+/.covered.db
+/external

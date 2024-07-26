@@ -1,22 +1,7 @@
-# Copyright, 2018, by Samuel G. D. Williams. <http://www.codeotaku.com>
-# 
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-# 
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-# 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
+# frozen_string_literal: true
+
+# Released under the MIT License.
+# Copyright, 2018-2024, by Samuel Williams.
 
 require_relative 'result'
 require_relative 'field'
@@ -96,14 +81,8 @@ module DB
 			ffi_attach_function :PQescapeLiteral, [:pointer, :string, :size_t], :pointer, as: :escape_literal
 			ffi_attach_function :PQescapeIdentifier, [:pointer, :string, :size_t], :pointer, as: :escape_identifier
 			
-			module IO
-				def self.new(fd, mode)
-					Async::IO::Generic.new(::IO.new(fd, mode, autoclose: false))
-				end
-			end
-			
 			class Connection < FFI::Pointer
-				def self.connect(wrapper: IO, types: DEFAULT_TYPES, **options)
+				def self.connect(types: DEFAULT_TYPES, **options)
 					# Postgres expects "dbname" as the key name:
 					if database = options.delete(:database)
 						options[:dbname] = database
@@ -120,7 +99,7 @@ module DB
 					pointer = Native.connect_start_params(keys.array, values.array, 0)
 					Native.set_nonblocking(pointer, 1)
 					
-					io = wrapper.new(Native.socket(pointer), "r+")
+					io = ::IO.new(Native.socket(pointer), "r+", autoclose: false)
 					
 					while status = Native.connect_poll(pointer)
 						break if status == :ok || status == :failed
