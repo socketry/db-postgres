@@ -88,17 +88,7 @@ module DB
 							return string
 						end
 						
-						if match = string.match(/\A(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+(?:\.\d+)?)([-+]\d\d(?::\d\d)?)?\z/)
-							parts = match.captures
-							
-							parts[5] = Rational(parts[5])
-							
-							if parts[6].nil?
-								parts[6] = '+00'
-							end
-							
-							return Time.new(*parts)
-						end
+						return Time.new(string, in: 0)
 					end
 				end
 				
