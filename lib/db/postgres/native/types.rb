@@ -91,7 +91,7 @@ module DB
 						if match = string.match(/\A(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+(?:\.\d+)?)([-+]\d\d(?::\d\d)?)?\z/)
 							parts = match.captures
 							
-							parts[5] = BigDecimal(parts[5])
+							parts[5] = Rational(parts[5])
 							
 							if parts[6].nil?
 								parts[6] = '+00'

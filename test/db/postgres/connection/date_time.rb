@@ -32,25 +32,25 @@ describe DB::Postgres::Connection do
 	let(:connection) {subject.new(**CREDENTIALS)}
 		
 	# PG produces: "2022-11-11 12:38:59.123456+00"
-	it_behaves_like ATimestamp, 'UTC', '2022-11-11 23:38:59.123456+11', Time.new(2022, 11, 11, 23, 38, BigDecimal('59.123456'), '+11:00')
+	it_behaves_like ATimestamp, 'UTC', '2022-11-11 23:38:59.123456+11', Time.new(2022, 11, 11, 23, 38, Rational('59.123456'), '+11:00')
 	
 	# PG produces: "2022-11-11 12:38:59+00"
-	it_behaves_like ATimestamp, 'UTC', '2022-11-11 23:38:59+11', Time.new(2022, 11, 11, 23, 38, BigDecimal('59'), '+11:00')
+	it_behaves_like ATimestamp, 'UTC', '2022-11-11 23:38:59+11', Time.new(2022, 11, 11, 23, 38, Rational('59'), '+11:00')
 	
 	# PG produces: "2022-11-11 23:38:59.123456+00"
-	it_behaves_like ATimestamp, 'UTC', '2022-11-11 23:38:59.123456', Time.new(2022, 11, 11, 23, 38, BigDecimal('59.123456'), '+00:00')
+	it_behaves_like ATimestamp, 'UTC', '2022-11-11 23:38:59.123456', Time.new(2022, 11, 11, 23, 38, Rational('59.123456'), '+00:00')
 	
 	# PG produces: "2022-11-11 23:38:59+11"
-	it_behaves_like ATimestamp, 'Australia/Sydney', '2022-11-11 23:38:59', Time.new(2022, 11, 11, 23, 38, BigDecimal('59'), '+11:00')
+	it_behaves_like ATimestamp, 'Australia/Sydney', '2022-11-11 23:38:59', Time.new(2022, 11, 11, 23, 38, Rational('59'), '+11:00')
 	
 	# PG produces: "2022-11-12 06:08:59.123456+11"
-	it_behaves_like ATimestamp, 'Australia/Sydney', '2022-11-11 23:38:59.123456+04:30', Time.new(2022, 11, 11, 23, 38, BigDecimal('59.123456'), '+04:30')
+	it_behaves_like ATimestamp, 'Australia/Sydney', '2022-11-11 23:38:59.123456+04:30', Time.new(2022, 11, 11, 23, 38, Rational('59.123456'), '+04:30')
 	
 	# PG produces: "2000-01-01 05:30:00+05:30"
 	it_behaves_like ATimestamp, 'Asia/Kolkata', '2000-01-01 00:00:00+00', Time.new(2000, 1, 1, 5, 30, 0, '+05:30')
 	
 	# PG produces: "2022-11-11 23:38:59+01"
-	it_behaves_like ATimestamp, 'Europe/Lisbon', '2022-11-11 23:38:59+01', Time.new(2022, 11, 11, 23, 38, BigDecimal('59'), '+01:00')
+	it_behaves_like ATimestamp, 'Europe/Lisbon', '2022-11-11 23:38:59+01', Time.new(2022, 11, 11, 23, 38, Rational('59'), '+01:00')
 	
 	# PG produces: "infinity"
 	it_behaves_like ATimestamp, 'UTC', 'infinity', 'infinity'
