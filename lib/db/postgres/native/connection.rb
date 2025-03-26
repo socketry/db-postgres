@@ -186,6 +186,14 @@ module DB
 					flush
 				end
 				
+				def send_query_params(statement, *params)
+					size = params.size
+					params = Strings.new(params)
+					check! Native.send_query_params(self, statement, size, nil, params.array, nil, nil, 0)
+					
+					flush
+				end
+				
 				def next_result(types: @types)
 					if result = self.get_result
 						status = Native.result_status(result)

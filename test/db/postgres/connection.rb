@@ -26,6 +26,16 @@ describe DB::Postgres::Connection do
 	ensure
 		connection.close
 	end
+
+	it "should execute query with arguments" do
+		connection.send_query_params("SELECT $1::BIGINT AS LIFE, $2 AS ANSWER", 42, "Life, the universe and everything")
+		
+		result = connection.next_result
+		
+		expect(result.to_a).to be == [[42, "Life, the universe and everything"]]
+	ensure
+		connection.close
+	end
 	
 	it "should execute multiple queries" do
 		connection.send_query("SELECT 42 AS LIFE; SELECT 24 AS LIFE")
