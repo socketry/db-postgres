@@ -44,6 +44,16 @@ module DB
 					end
 				end
 				
+				class ByteA
+					def name
+						"BYTEA"
+					end
+					
+					def parse(string)
+						[string[2..]].pack('H*') if string
+					end
+				end
+				
 				class Decimal
 					def name
 						"DECIMAL"
