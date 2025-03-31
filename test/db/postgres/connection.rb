@@ -60,6 +60,17 @@ describe DB::Postgres::Connection do
 		connection.close
 	end
 	
+	it "can handle bytea output" do
+		connection.send_query("SELECT '\\x414243003839'::BYTEA")
+		
+		result = connection.next_result
+		cell = result.to_a.first.first
+		expect(cell).to be == "ABC\x0089".b
+		expect(cell.encoding).to be == Encoding::ASCII_8BIT
+	ensure
+		connection.close
+	end
+	
 	with '#append_string' do
 		it "should escape string" do
 			expect(connection.append_string("Hello 'World'")).to be == "'Hello ''World'''"
