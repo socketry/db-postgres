@@ -11,10 +11,12 @@ describe DB::Postgres::Connection do
 	
 	let(:connection) {subject.new(**CREDENTIALS)}
 	
+	after do
+		@connection&.close
+	end
+	
 	it "should connect to local postgres" do
 		expect(connection.status).to be == :ok
-	ensure
-		connection.close
 	end
 	
 	it "should execute query" do
@@ -23,8 +25,6 @@ describe DB::Postgres::Connection do
 		result = connection.next_result
 		
 		expect(result.to_a).to be == [[42]]
-	ensure
-		connection.close
 	end
 	
 	it "should execute multiple queries" do
@@ -35,8 +35,6 @@ describe DB::Postgres::Connection do
 		
 		result = connection.next_result
 		expect(result.to_a).to be == [[24]]
-	ensure
-		connection.close
 	end
 	
 	it "can get current time" do
@@ -46,38 +44,28 @@ describe DB::Postgres::Connection do
 		row = result.to_a.first
 		
 		expect(row.first).to be_within(1).of(Time.now.utc)
-	ensure
-		connection.close
 	end
 	
 	with '#append_string' do
 		it "should escape string" do
 			expect(connection.append_string("Hello 'World'")).to be == "'Hello ''World'''"
 			expect(connection.append_string('Hello "World"')).to be == "'Hello \"World\"'"
-		ensure
-			connection.close
 		end
 	end
 	
 	with '#append_literal' do
 		it "should escape string" do
 			expect(connection.append_literal("Hello World")).to be == "'Hello World'"
-		ensure
-			connection.close
 		end
 		
 		it "should not escape integers" do
 			expect(connection.append_literal(42)).to be == "42"
-		ensure
-			connection.close
 		end
 	end
 	
 	with '#append_identifier' do
 		it "should escape identifier" do
 			expect(connection.append_identifier("Hello World")).to be == '"Hello World"'
-		ensure
-			connection.close
 		end
 		
 		it "can handle booleans" do
@@ -91,8 +79,19 @@ describe DB::Postgres::Connection do
 			row = result.to_a.first
 			
 			expect(row.first).to be == true
-		ensure
-			connection.close
+		end
+	end
+	
+	with '#features' do
+		it "should return configured PostgreSQL features" do
+			features = connection.features
+			
+			expect(features.alter_column_type?).to be == true
+			expect(features.using_clause?).to be == true
+			expect(features.conditional_operations?).to be == true
+			expect(features.transactional_schema?).to be == true
+			expect(features.batch_alter_table?).to be == true
+			expect(features.modify_column?).to be == false
 		end
 	end
 end
