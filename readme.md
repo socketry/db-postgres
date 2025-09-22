@@ -12,7 +12,11 @@ Please see the [project documentation](https://socketry.github.io/db-postgres/) 
 
 ## Releases
 
-There are no documented releases.
+Please see the [project releases](https://socketry.github.io/db-postgres/releases/index) for all releases.
+
+### v0.9.0
+
+  - Add support for `DB::Features`.
 
 ## Contributing
 

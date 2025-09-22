@@ -1,0 +1,12 @@
+# Automatically generated context index for Utopia::Project guides.
+# Do not edit then files in this directory directly, instead edit the guides and then run `bake utopia:project:agent:context:update`.
+---
+description: Ruby FFI bindings for libpq C interface.
+metadata:
+  documentation_uri: https://socketry.github.io/db-postgres/
+  funding_uri: https://github.com/sponsors/ioquatix
+  source_code_uri: https://github.com/socketry/db-postgres.git
+files:
+- path: getting-started.md
+  title: Getting Started
+  description: This guide explains how to get started with the `db-postgres` gem.
