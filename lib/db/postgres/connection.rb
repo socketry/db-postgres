@@ -102,6 +102,12 @@ module DB
 				@native.send_query(statement)
 			end
 			
+			def send_query_params(statement, *params)
+				@native.discard_results
+				
+				@native.send_query_params(statement, *params)
+			end
+			
 			def next_result
 				@native.next_result
 			end

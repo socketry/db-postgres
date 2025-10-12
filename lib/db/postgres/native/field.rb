@@ -40,6 +40,8 @@ module DB
 				# These are hard coded OIDs.
 				16 => Types::Boolean.new,
 				
+				17 => Types::ByteA.new,
+				
 				20 => Types::Integer.new("int8"),
 				21 => Types::Integer.new("int2"),
 				23 => Types::Integer.new("int4"),

@@ -186,6 +186,29 @@ module DB
 					flush
 				end
 				
+				def send_query_params(statement, *params)
+					params = params.map(&:to_s)
+					size = params.size
+					is_binary = params.map { |param| param.include?("\x00".b) }
+					
+					# type 17 => bytea (https://github.com/postgres/postgres/blob/master/src/include/catalog/pg_type.dat)
+					paramTypes = FFI::MemoryPointer.new(:int, params.size)
+					paramTypes.write_array_of_type(FFI::Type::INT, :put_int, is_binary.map { |binary| binary ? 17 : 0 })
+					
+					paramValues = FFI::MemoryPointer.new(:pointer, params.size)
+					paramValues.write_array_of_pointer(params.map { |param| FFI::MemoryPointer.from_string(param) })
+					
+					paramLengths = FFI::MemoryPointer.new(:int, params.size)
+					paramLengths.write_array_of_type(FFI::Type::INT, :put_int, params.zip(is_binary).map { |param, binary| binary ? param.bytesize : 0 })
+					
+					paramFormats = FFI::MemoryPointer.new(:int, params.size)
+					paramFormats.write_array_of_type(FFI::Type::INT, :put_int, is_binary.map { |binary| binary ? 1 : 0 })
+					
+					check! Native.send_query_params(self, statement, size, paramTypes, paramValues, paramLengths, paramFormats, 0)
+					
+					flush
+				end
+				
 				def next_result(types: @types)
 					if result = self.get_result
 						status = Native.result_status(result)

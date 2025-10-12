@@ -26,6 +26,16 @@ describe DB::Postgres::Connection do
 		
 		expect(result.to_a).to be == [[42]]
 	end
+
+	it "should execute query with arguments" do
+		connection.send_query_params("SELECT $1::BIGINT AS LIFE, $2 AS ANSWER", 42, "Life, the universe and everything")
+		
+		result = connection.next_result
+		
+		expect(result.to_a).to be == [[42, "Life, the universe and everything"]]
+	ensure
+		connection.close
+	end
 	
 	it "should execute multiple queries" do
 		connection.send_query("SELECT 42 AS LIFE; SELECT 24 AS LIFE")
@@ -44,6 +54,28 @@ describe DB::Postgres::Connection do
 		row = result.to_a.first
 		
 		expect(row.first).to be_within(1).of(Time.now.utc)
+	end
+	
+	it "can handle bytea output" do
+		connection.send_query("SELECT '\\x414243003839'::BYTEA")
+		
+		result = connection.next_result
+		cell = result.to_a.first.first
+		expect(cell).to be == "ABC\x0089".b
+		expect(cell.encoding).to be == Encoding::ASCII_8BIT
+	ensure
+		connection.close
+	end
+	
+	it "can handle bytea argument" do
+		connection.send_query_params("SELECT $1::BYTEA", "ABC\x0089".b)
+		
+		result = connection.next_result
+		cell = result.to_a.first.first
+		expect(cell).to be == "ABC\x0089".b
+		expect(cell.encoding).to be == Encoding::ASCII_8BIT
+	ensure
+		connection.close
 	end
 	
 	with '#append_string' do
