@@ -50,7 +50,7 @@ module DB
 				# Non-blocking mode:
 				:started, # Waiting for connection to be made.
 				:made, # Connection OK; waiting to send.
-				:awaiting_response, #Waiting for a response from the postmaster.
+				:awaiting_response, # Waiting for a response from the postmaster.
 				:auth_ok, # Received authentication; waiting for backend startup.
 				:setenv, # Negotiating environment.
 				:ssl_startup, # Negotiating SSL.
@@ -106,7 +106,7 @@ module DB
 					keys = Strings.new(options.keys)
 					values = Strings.new(options.values)
 					
-					pointer = Native.connect_start_params(keys.array, values.array, 0)
+					pointer = Native.connect_start_params(keys.array, values.array, 1)
 					Native.set_nonblocking(pointer, 1)
 					
 					io = ::IO.new(Native.socket(pointer), "r+", autoclose: false)

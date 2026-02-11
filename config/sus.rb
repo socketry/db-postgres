@@ -12,3 +12,7 @@ include Covered::Sus
 	database: "test",
 	host: "127.0.0.1"
 }
+
+::CREDENTIALS_URL = {
+	dbname: "postgresql://test:test@127.0.0.1/test"
+}
