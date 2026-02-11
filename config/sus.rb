@@ -14,5 +14,5 @@ include Covered::Sus
 }
 
 ::CREDENTIALS_URL = {
-	dbname: 'postgresql://test:test@127.0.0.1/test'
+	dbname: "postgresql://test:test@127.0.0.1/test"
 }
