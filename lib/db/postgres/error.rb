@@ -5,6 +5,7 @@
 
 module DB
 	module Postgres
+		# An error raised by the PostgreSQL adapter.
 		class Error < StandardError
 		end
 	end

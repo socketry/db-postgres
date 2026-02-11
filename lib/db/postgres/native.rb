@@ -8,6 +8,7 @@ require "ffi/native/config_tool"
 
 module DB
 	module Postgres
+		# Provides FFI bindings to the native PostgreSQL client library (libpq).
 		module Native
 			extend FFI::Native::Library
 			extend FFI::Native::Loader
