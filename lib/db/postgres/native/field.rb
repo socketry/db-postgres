@@ -1,17 +1,17 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2020-2024, by Samuel Williams.
+# Copyright, 2020-2026, by Samuel Williams.
 
-require_relative 'types'
+require_relative "types"
 
 module DB
 	module Postgres
 		module Native
 			DEFAULT_TYPES = {
 				# Pseudo types:
-				primary_key: Types::Integer.new('BIGSERIAL PRIMARY KEY'),
-				foreign_key: Types::Integer.new('BIGINT'),
+				primary_key: Types::Integer.new("BIGSERIAL PRIMARY KEY"),
+				foreign_key: Types::Integer.new("BIGINT"),
 				text: Types::Text.new("TEXT"),
 				string: Types::Text.new("VARCHAR(255)"),
 				
@@ -46,8 +46,8 @@ module DB
 				
 				114 => Types::JSON.new,
 				
-				700 => Types::Float.new('float4'),
-				701 => Types::Float.new('float8'),
+				700 => Types::Float.new("float4"),
+				701 => Types::Float.new("float8"),
 				
 				1082 => Types::Date.new,
 				1083 => Types::DateTime.new("TIME"),

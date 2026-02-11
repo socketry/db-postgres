@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2018-2024, by Samuel Williams.
+# Copyright, 2018-2026, by Samuel Williams.
 
-require_relative 'result'
-require_relative 'field'
-require_relative '../error'
+require_relative "result"
+require_relative "field"
+require_relative "../error"
 
 module DB
 	module Postgres

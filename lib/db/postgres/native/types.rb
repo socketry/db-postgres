@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2020-2024, by Samuel Williams.
+# Copyright, 2020-2026, by Samuel Williams.
 
-require 'json'
-require 'bigdecimal'
+require "json"
+require "bigdecimal"
 
 module DB
 	module Postgres
@@ -40,7 +40,7 @@ module DB
 					end
 					
 					def parse(string)
-						string == 't'
+						string == "t"
 					end
 				end
 				
@@ -84,7 +84,7 @@ module DB
 					attr :name
 					
 					def parse(string)
-						if string == '-infinity' || string == 'infinity' || string.nil?
+						if string == "-infinity" || string == "infinity" || string.nil?
 							return string
 						end
 						
@@ -94,7 +94,7 @@ module DB
 							parts[5] = Rational(parts[5])
 							
 							if parts[6].nil?
-								parts[6] = '+00'
+								parts[6] = "+00"
 							end
 							
 							return Time.new(*parts)

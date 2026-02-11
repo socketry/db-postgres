@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2018-2024, by Samuel Williams.
+# Copyright, 2018-2026, by Samuel Williams.
 
-require 'async/pool/resource'
-require 'db/features'
-require_relative 'native/connection'
+require "async/pool/resource"
+require "db/features"
+require_relative "native/connection"
 
 module DB
 	module Postgres
@@ -43,11 +43,11 @@ module DB
 				when Numeric
 					buffer << value.to_s
 				when TrueClass
-					buffer << 'TRUE'
+					buffer << "TRUE"
 				when FalseClass
-					buffer << 'FALSE'
+					buffer << "FALSE"
 				when nil
-					buffer << 'NULL'
+					buffer << "NULL"
 				else
 					append_string(value, buffer)
 				end
@@ -60,7 +60,7 @@ module DB
 				when Array
 					first = true
 					value.each do |part|
-						buffer << '.' unless first
+						buffer << "." unless first
 						first = false
 						
 						buffer << @native.escape_identifier(part)
@@ -72,7 +72,7 @@ module DB
 				return buffer
 			end
 			
-			def key_column(name = 'id', primary: true, null: false)
+			def key_column(name = "id", primary: true, null: false)
 				buffer = String.new
 				
 				append_identifier(name, buffer)
