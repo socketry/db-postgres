@@ -3,13 +3,13 @@
 # Released under the MIT License.
 # Copyright, 2018-2024, by Samuel Williams.
 
-require 'db/postgres/connection'
-require 'sus/fixtures/async'
+require "db/postgres/connection"
+require "sus/fixtures/async"
 
 describe DB::Postgres::Connection do
 	include Sus::Fixtures::Async::ReactorContext
 	
-	let(:connection) { subject.new(**CREDENTIALS_URL) }
+	let(:connection) {subject.new(**CREDENTIALS_URL)}
 	
 	after do
 		@connection&.close
@@ -38,7 +38,7 @@ describe DB::Postgres::Connection do
 	end
 	
 	it "can get current time" do
-		connection.send_query("SELECT (NOW() AT TIME ZONE 'UTC') AS NOW")
+		connection.send_query("SELECT (NOW() AT TIME ZONE "UTC") AS NOW")
 		
 		result = connection.next_result
 		row = result.to_a.first
@@ -46,16 +46,16 @@ describe DB::Postgres::Connection do
 		expect(row.first).to be_within(1).of(Time.now.utc)
 	end
 	
-	with '#append_string' do
+	with "#append_string" do
 		it "should escape string" do
-			expect(connection.append_string("Hello 'World'")).to be == "'Hello ''World'''"
-			expect(connection.append_string('Hello "World"')).to be == "'Hello \"World\"'"
+			expect(connection.append_string("Hello "World"")).to be == ""Hello ""World""""
+			expect(connection.append_string("Hello "World"")).to be == ""Hello \"World\"""
 		end
 	end
 	
-	with '#append_literal' do
+	with "#append_literal" do
 		it "should escape string" do
-			expect(connection.append_literal("Hello World")).to be == "'Hello World'"
+			expect(connection.append_literal("Hello World")).to be == ""Hello World""
 		end
 		
 		it "should not escape integers" do
@@ -63,9 +63,9 @@ describe DB::Postgres::Connection do
 		end
 	end
 	
-	with '#append_identifier' do
+	with "#append_identifier" do
 		it "should escape identifier" do
-			expect(connection.append_identifier("Hello World")).to be == '"Hello World"'
+			expect(connection.append_identifier("Hello World")).to be == ""Hello World""
 		end
 		
 		it "can handle booleans" do
@@ -82,7 +82,7 @@ describe DB::Postgres::Connection do
 		end
 	end
 	
-	with '#features' do
+	with "#features" do
 		it "should return configured PostgreSQL features" do
 			features = connection.features
 			
