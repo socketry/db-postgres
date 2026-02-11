@@ -48,14 +48,14 @@ describe DB::Postgres::Connection do
 	
 	with "#append_string" do
 		it "should escape string" do
-			expect(connection.append_string("Hello "World"")).to be == ""Hello ""World""""
-			expect(connection.append_string("Hello "World"")).to be == ""Hello \"World\"""
+			expect(connection.append_string("Hello 'World'")).to be == "'Hello ''World'''"
+			expect(connection.append_string('Hello "World"')).to be == "'Hello \"World\"'"
 		end
 	end
 	
 	with "#append_literal" do
 		it "should escape string" do
-			expect(connection.append_literal("Hello World")).to be == ""Hello World""
+			expect(connection.append_literal("Hello World")).to be == "'Hello World'"
 		end
 		
 		it "should not escape integers" do
@@ -65,7 +65,7 @@ describe DB::Postgres::Connection do
 	
 	with "#append_identifier" do
 		it "should escape identifier" do
-			expect(connection.append_identifier("Hello World")).to be == ""Hello World""
+			expect(connection.append_identifier("Hello World")).to be == '"Hello World"'
 		end
 		
 		it "can handle booleans" do
