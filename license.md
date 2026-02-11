@@ -1,6 +1,6 @@
 # MIT License
 
-Copyright, 2018-2024, by Samuel Williams.  
+Copyright, 2018-2026, by Samuel Williams.  
 Copyright, 2021, by Tony Schneider.  
 Copyright, 2022, by Aidan Samuel.  
 

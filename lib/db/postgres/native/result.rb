@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2018-2024, by Samuel Williams.
+# Copyright, 2018-2026, by Samuel Williams.
 
-require_relative '../native'
+require_relative "../native"
 
 module DB
 	module Postgres
@@ -38,7 +38,12 @@ module DB
 			ffi_attach_function :PQgetCopyData, [:pointer, :pointer, :int], :int, as: :get_copy_data
 			ffi_attach_function :PQfreemem, [:pointer], :void, as: :free_memory
 			
+			# A result set from a database query with row iteration and type casting.
 			class Result < FFI::Pointer
+				# Initialize a new result set wrapper.
+				# @parameter connection [Connection] The connection that produced this result.
+				# @parameter types [Hash] Type mapping for field conversion.
+				# @parameter address [FFI::Pointer] The pointer to the native result.
 				def initialize(connection, types = {}, address)
 					super(address)
 					
@@ -48,22 +53,33 @@ module DB
 					@casts = nil
 				end
 				
+				# Get the number of fields in this result set.
+				# @returns [Integer] The field count.
 				def field_count
 					Native.field_count(self)
 				end
 				
+				# Get the type converters for each field.
+				# @returns [Array] The array of type converter objects.
 				def field_types
 					field_count.times.collect{|i| @types[Native.field_type(self, i)]}
 				end
 				
+				# Get the field names for this result set.
+				# @returns [Array(String)] The array of field names.
 				def field_names
 					field_count.times.collect{|i| Native.field_name(self, i)}
 				end
 				
+				# Get the number of rows in this result set.
+				# @returns [Integer] The row count.
 				def row_count
 					Native.row_count(self)
 				end
 				
+				# Cast row values to appropriate Ruby types.
+				# @parameter row [Array] The raw row data.
+				# @returns [Array] The row with values cast to proper types.
 				def cast!(row)
 					@casts ||= self.field_types
 					
@@ -76,6 +92,9 @@ module DB
 					return row
 				end
 				
+				# Iterate over each row in the result set.
+				# @yields {|row| ...} Each row as an array.
+				# 	@parameter row [Array] The current row data.
 				def each
 					row_count.times do |i|
 						yield cast!(get_row(i))
@@ -84,6 +103,10 @@ module DB
 					Native.clear(self)
 				end
 				
+				# Map over each row in the result set.
+				# @yields {|row| ...} Each row as an array.
+				# 	@parameter row [Array] The current row data.
+				# @returns [Array] The mapped results.
 				def map(&block)
 					results = []
 					
@@ -94,6 +117,8 @@ module DB
 					return results
 				end
 				
+				# Convert the entire result set to an array.
+				# @returns [Array(Array)] All rows as arrays.
 				def to_a
 					rows = []
 					

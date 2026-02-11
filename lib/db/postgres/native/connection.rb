@@ -1,16 +1,19 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2018-2024, by Samuel Williams.
+# Copyright, 2018-2026, by Samuel Williams.
 
-require_relative 'result'
-require_relative 'field'
-require_relative '../error'
+require_relative "result"
+require_relative "field"
+require_relative "../error"
 
 module DB
 	module Postgres
 		module Native
+			# Helper class for managing FFI string arrays.
 			class Strings
+				# Initialize a string array for FFI.
+				# @parameter values [Array] The array of values to convert to FFI strings.
 				def initialize(values)
 					@array = FFI::MemoryPointer.new(:pointer, values.size + 1)
 					@pointers = values.map do |value|
@@ -19,6 +22,7 @@ module DB
 					@array.write_array_of_pointer(@pointers)
 				end
 				
+				# @attribute [FFI::MemoryPointer] The FFI array pointer.
 				attr :array
 			end
 			
@@ -81,7 +85,13 @@ module DB
 			ffi_attach_function :PQescapeLiteral, [:pointer, :string, :size_t], :pointer, as: :escape_literal
 			ffi_attach_function :PQescapeIdentifier, [:pointer, :string, :size_t], :pointer, as: :escape_identifier
 			
+			# A native FFI connection to the PostgreSQL client library.
 			class Connection < FFI::Pointer
+				# Establish a connection to the PostgreSQL server.
+				# @parameter types [Hash] Type mapping configuration.
+				# @parameter options [Hash] Connection options (database, username, password, host, port, etc.).
+				# @returns [Connection] A new connected instance.
+				# @raises [Error] If the connection fails.
 				def self.connect(types: DEFAULT_TYPES, **options)
 					# Postgres expects "dbname" as the key name:
 					if database = options.delete(:database)
@@ -121,6 +131,10 @@ module DB
 					return self.new(pointer, io, types)
 				end
 				
+				# Initialize a native connection wrapper.
+				# @parameter address [FFI::Pointer] The pointer to the native connection.
+				# @parameter io [IO] The IO object for the socket.
+				# @parameter types [Hash] Type mapping configuration.
 				def initialize(address, io, types)
 					super(address)
 					
@@ -128,6 +142,7 @@ module DB
 					@types = types
 				end
 				
+				# @attribute [Hash] The type mapping configuration.
 				attr :types
 				
 				# Return the status of the connection.
@@ -152,6 +167,9 @@ module DB
 					@io.close
 				end
 				
+				# Escape a literal string value for safe inclusion in SQL queries.
+				# @parameter value [String] The value to escape.
+				# @returns [String] The escaped string with quotes.
 				def escape_literal(value)
 					value = value.to_s
 					
@@ -164,6 +182,9 @@ module DB
 					return string
 				end
 				
+				# Escape an identifier for safe inclusion in SQL queries.
+				# @parameter value [String] The identifier to escape.
+				# @returns [String] The escaped identifier with quotes.
 				def escape_identifier(value)
 					value = value.to_s
 					
@@ -176,16 +197,23 @@ module DB
 					return string
 				end
 				
+				# Enable single row mode for streaming large result sets.
 				def single_row_mode!
 					Native.set_single_row_mode(self)
 				end
 				
+				# Send a query to the server for execution.
+				# @parameter statement [String] The SQL statement to execute.
 				def send_query(statement)
 					check! Native.send_query(self, statement)
 					
 					flush
 				end
 				
+				# Get the next result set from a multi-result query.
+				# @parameter types [Hash] Type mapping to use for this result.
+				# @returns [Result | Nil] The next result set, or `nil` if no more results.
+				# @raises [Error] If the query resulted in an error.
 				def next_result(types: @types)
 					if result = self.get_result
 						status = Native.result_status(result)

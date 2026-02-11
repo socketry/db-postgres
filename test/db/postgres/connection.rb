@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 # Released under the MIT License.
-# Copyright, 2018-2024, by Samuel Williams.
+# Copyright, 2018-2026, by Samuel Williams.
 
-require 'db/postgres/connection'
-require 'sus/fixtures/async'
+require "db/postgres/connection"
+require "sus/fixtures/async"
 
 describe DB::Postgres::Connection do
 	include Sus::Fixtures::Async::ReactorContext
@@ -46,14 +46,14 @@ describe DB::Postgres::Connection do
 		expect(row.first).to be_within(1).of(Time.now.utc)
 	end
 	
-	with '#append_string' do
+	with "#append_string" do
 		it "should escape string" do
 			expect(connection.append_string("Hello 'World'")).to be == "'Hello ''World'''"
 			expect(connection.append_string('Hello "World"')).to be == "'Hello \"World\"'"
 		end
 	end
 	
-	with '#append_literal' do
+	with "#append_literal" do
 		it "should escape string" do
 			expect(connection.append_literal("Hello World")).to be == "'Hello World'"
 		end
@@ -63,7 +63,7 @@ describe DB::Postgres::Connection do
 		end
 	end
 	
-	with '#append_identifier' do
+	with "#append_identifier" do
 		it "should escape identifier" do
 			expect(connection.append_identifier("Hello World")).to be == '"Hello World"'
 		end
@@ -82,7 +82,7 @@ describe DB::Postgres::Connection do
 		end
 	end
 	
-	with '#features' do
+	with "#features" do
 		it "should return configured PostgreSQL features" do
 			features = connection.features
 			
