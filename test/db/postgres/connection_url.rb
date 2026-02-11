@@ -38,7 +38,7 @@ describe DB::Postgres::Connection do
 	end
 	
 	it "can get current time" do
-		connection.send_query("SELECT (NOW() AT TIME ZONE "UTC") AS NOW")
+		connection.send_query("SELECT (NOW() AT TIME ZONE 'UTC') AS NOW")
 		
 		result = connection.next_result
 		row = result.to_a.first
